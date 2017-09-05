@@ -1,0 +1,34 @@
+NOTE: For all assignments, you are not allowed to modify the type signatures of the functions.
+
+Part 1)
+Download lab1.hs from the course website.
+Implement the maxNum function.  This function reads in a list of numbers and returns the largest.
+Define this function in a recursive manner. (Note that using the length function is cheating).
+
+
+Part 2)
+Implement the "fizzbuzz" game.  The function counts from 1 to the specified number, returning a
+string with the result.  The rules are:
+
+    If a number is divisible by 3 and by 5, instead say "fizzbuzz"
+    Else if a number is divisible by 3, instead say "fizz"
+    Else if a number is divisible by 5, instead say "buzz"
+    Otherwise say the number
+
+Here is a sample run of this function:
+
+*Main> fizzbuzz 15
+"1 2 fizz 4 buzz fizz 7 8 fizz buzz 11 fizz 13 14 fizzbuzz"
+
+
+Part 3)
+Download JSON.hs and jsonDriver.hs from the course website.
+
+In JSON.hs, implement the JObject case of the toString function.  Compile and run jsonDriver.hs
+and verify that your results look to be correct.
+
+When you have finished, upload the assignment through Canvas (pasting in your modified programs),
+
+If you do not have access to Canvas, submit it once you do have access (with a reminder that you
+did not have access previously.
+
