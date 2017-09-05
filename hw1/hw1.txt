@@ -1,0 +1,64 @@
+For the first assignment, we will look at how Haskell handles big numbers.
+
+***NOTE: YOU MAY NOT CHANGE ANY TYPE SIGNATURES***
+***IF YOU DO, YOU WILL GET A ZERO FOR THE ASSIGNMENT***
+
+Consider the following Java program (available in Test.java).
+
+  public class Test {
+    public void main(String[] args) {
+      System.out.println(999999999999999999999 * 2);
+    }
+  }
+
+You could easily calculate 999999999999999999999 * 2 with pencil and paper;
+Java cannot handle it.
+
+  $ javac Test.java
+  Test.java:3: error: integer number too large: 999999999999999999999
+      System.out.println(999999999999999999999 * 2);
+                         ^
+  1 error
+
+With Haskell, there is no problem:
+
+  $ ghci
+  GHCi, version 7.6.3: http://www.haskell.org/ghc/  :? for help
+  Loading package ghc-prim ... linking ... done.
+  Loading package integer-gmp ... linking ... done.
+  Loading package base ... linking ... done.
+  Prelude> 999999999999999999999 * 2
+  1999999999999999999998
+  Prelude>
+
+So how does Haskell handle these numbers?
+We will implement a simplified BigNum module to understand it better.
+
+In our implementation, a number will be a list of "blocks" of numbers from 0-999,
+stored with the least significant "block" first. So 9,073,201 will be
+stored as:
+
+  [201,73,9]
+
+Your job is to complete BigNum.hs.  The breakdown of points is as follows:
+* 10 points -- Complete bigAdd'
+*  5 points -- Complete bigSubtract'
+*  3 points -- Complete bigEq
+*  1 points -- Complete bigMultiply
+*  1 points -- Complete bigPowerOf
+
+
+Starter code is available at http://cs.sjsu.edu/~austin/cs252-fall15/hw/hw1/.
+The files include:
+* BigNum.hs -- You will modify this file (only).
+* Calculator.hs -- A (very) simple calculator that relies on your BigNum module.
+* test.hs -- A number of test cases that use BigNum.
+* input -- A number of cases that Calculator.hs should handle correctly.
+* output_EXPECTED -- the expected results of calling (from the command line):
+  $runhaskell test.hs
+  $runhaskell Calculator.hs < input
+
+Note that negative numbers are not supported, and should raise an error.
+
+Submit BigNum.hs through Canvas.
+
