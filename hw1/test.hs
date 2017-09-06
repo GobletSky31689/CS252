@@ -36,7 +36,7 @@ main = do
   putStrLn $ show $ bigMultiply [98,74,1,3] [4]
 
   --2^8
-  putStrLn $ show $ bigPowerOf [2] [20]
+  putStrLn $ show $ bigPowerOf [2] [8]
   --1832^0
   putStrLn $ show $ bigPowerOf [832,1] [0]
 
