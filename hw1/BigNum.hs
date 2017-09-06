@@ -47,12 +47,16 @@ lessThan [] [] = False
 lessThan [] (y:[]) = True
 lessThan (x:[]) [] = False
 lessThan [x] [y] = x<y
-lessThan a@(x:xs) b@(y:ys) =  if length a < length b 
+lessThan x y =  if length x < length y 
                                 then True
-                              else if length a > length b 
+                              else if length x > length y 
                                 then False
                               else 
-                                x<y || (x==y && xs `lessThan` ys)
+                                lastx<lasty || (lastx==lasty && initx `lessThan` inity)
+                              where lastx = last x
+                                    lasty = last y
+                                    initx = init x
+                                    inity = init y
 
 bigSubtract :: BigNum -> BigNum -> BigNum
 bigSubtract x y = if length x < length y || (x `lessThan` y)
