@@ -1,3 +1,4 @@
+
 This File is _literate Haskell_.
 That means that (in some sense) code and comments are reversed.
 By default, everything that I type is actually a comment.
@@ -25,19 +26,23 @@ The VTrue case has been done for you.
 You must complete the other cases.
 
 
+
 > evaluate :: Exp -> Val
 > evaluate ETrue = VTrue
 > evaluate EFalse = VFalse
 > evaluate (EInt intVal) = VInt intVal
-> evaluate (Eif cond expTrue expFalse) = if (evaluate cond == VTrue)
+> evaluate (Eif cond expTrue expFalse) = if (condValue == VTrue)
 >											then (evaluate expTrue)
->										else if (evaluate cond == VFalse)
+>										else if (condValue == VFalse)
 >											then (evaluate expFalse)
 >										else error "Invalid expression"
-> evaluate (ESucc (EInt n)) = VInt (n+1)
-> evaluate (ESucc _) = error "Invalid Expression"
-> evaluate (EPred (EInt n)) = VInt (n-1)
-> evaluate (EPred _) = error "Invalid Expression"
+>										where condValue = evaluate cond
+> evaluate (ESucc expS) = case (evaluate expS) of
+>							VInt a -> VInt (a+1)
+>							_ -> error "Invalid"
+> evaluate (EPred expS) = case (evaluate expS) of
+>							VInt a -> VInt (a-1)
+>							_ -> error "Invalid"
 
 
 And here we have a couple of programs to test.
