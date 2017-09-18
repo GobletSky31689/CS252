@@ -54,14 +54,18 @@ object prog extends App {
 
   // Complete these declarations
   implicit object hEmptyJsonConverter extends JsonConverter[HEmpty.type] {
-    def convert(t: HEmpty.type) = ...
+    def convert(t: HEmpty.type) = "[]"
   }
   
   implicit def hNonEmptyJsonConverter[H : JsonConverter, T <: HList[_, _] : JsonConverter ]: JsonConverter[HNonEmpty[H, T]] = new JsonConverter[HNonEmpty[H, T]] {
-    ...
+    def convert(t: HNonEmpty[H, T]) = t match {
+      case HNonEmpty(t.head, HEmpty) => toJson(t.head)
+      case _ => "[" + toJson(t.head) + ", " + toJson(t.tail) + "]"
+    }
   }
 
   // Don't mess with these. Make it so that they print the right thing.
+  // println(toJson("Fred" :: HEmpty))
   println(toJson(3 :: "Fred" :: HEmpty))
   println(toJson((3 :: 4 :: HEmpty) :: 5 :: HEmpty))
 }
