@@ -1,0 +1,70 @@
+\documentclass{article}
+\pagenumbering{gobble} % No need for page No. as only one page is there
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{url} % My bibTex sources contain urls, so had to use this package
+\usepackage[super,square]{natbib} % WikiPedia like citations are cooler
+\title{Lab 4 Submission}
+\author{
+	Ujjawal Garg \\
+	San Jos\'{e} State University \\
+	ujjawal.garg@sjsu.edu $\bullet$ (408)-752-6034
+	}
+\date{September 21, 2017}
+\usepackage{filecontents}
+\begin{filecontents}{lab4.bib}
+@book{nisan2007algorithmic,
+  title={Algorithmic game theory},
+  author={Nisan, Noam and Roughgarden, Tim and Tardos, Eva and Vazirani, Vijay V},
+  volume={1},
+  year={2007},
+  publisher={Cambridge University Press Cambridge}
+}
+@article{simpkins2008towards,
+  title={Towards Adaptive Programming},
+  author={Simpkins, Christopher and Bhat, Sooraj and Isbell Jr, Charles and Mateas, Michael},
+  year={2008}
+}
+\end{filecontents}
+
+
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent % Huh? I did not like the indent here
+This document is a just a summary of my life history and goals\footnote{Nothing interesting to see here. LOL}. Oh, and it is also intended to demonstrate whatever meagre \LaTeX{} skills I have gained till now.
+\end{abstract}
+
+\section{Personal History}
+I have 2 years of experience in Mobile app development industry, but for reasons mentioned in Section~\ref{sec:Academia}, I decided to rejoin Academia. I am currently pursuing my Masters in Computer Science at San Jos\'{e} State University. 
+
+\section{Academic/Career Goals}
+
+\subsection{Academia} \label{sec:Academia}
+\begin{enumerate}
+\item Broaden my horizons
+\item Develop research and analytical skills
+\end{enumerate}
+
+\subsection{Career} 
+\begin{itemize}
+\item Work on something challenging
+\item Work on a product\footnote{e.g. IntelliJ is my goTo IDE. So, I think working at JetBrains could be cool} that I use a lot
+\end{itemize}
+
+\section{Research Topics of Interest}
+\begin{itemize}
+\item Algorithmic Game Theory~\cite{nisan2007algorithmic}
+\item Adaptive Programming~\cite{simpkins2008towards}
+\end{itemize}
+
+
+
+
+\bibliographystyle{plainurl}
+\bibliography{lab4}
+\end{document}
+
