@@ -1,0 +1,208 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+%\usepackagen{url}
+\usepackage{float}
+\usepackage{paralist}
+
+\floatstyle{boxed}
+\restylefloat{figure}
+
+
+
+\newcommand{\rel}[1]{ \mbox{\sc [#1]} }
+
+\title{Homework 2: Operational Semantics for WHILE}
+
+\author{
+  CS 252: Advanced Programming Languages \\
+  Prof. Thomas H. Austin \\
+  San Jos\'{e} State University \\
+  }
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+For this assignment,
+you will implement the semantics for a small imperative language, named WHILE.
+
+% Commands for formatting figure
+\newcommand{\mydefhead}[2]{\multicolumn{2}{l}{{#1}}&\mbox{\emph{#2}}\\}
+\newcommand{\mydefcase}[2]{\qquad\qquad& #1 &\mbox{#2}\\}
+
+% Commands for language format
+\newcommand{\assign}[2]{#1~{:=}~#2}
+\newcommand{\ife}[3]{\mbox{\tt if}~{#1}~\mbox{\tt then}~{#2}~\mbox{\tt else}~{#3}}
+\newcommand{\whilee}[2]{\mbox{\tt while}~(#1)~#2}
+\newcommand{\true}{\mbox{\tt true}}
+\newcommand{\false}{\mbox{\tt false}}
+
+\begin{figure}\label{fig:lang}
+\caption{The WHILE language}
+\[
+\begin{array}{llr}
+  \mydefhead{e ::=\qquad\qquad\qquad\qquad}{Expressions}
+  \mydefcase{x}{variables/addresses}
+  \mydefcase{v}{values}
+  \mydefcase{\assign x e}{assignment}
+  \mydefcase{e; e}{sequential expressions}
+  \mydefcase{e ~op~ e}{binary operations}
+  \mydefcase{\ife e e e}{conditional expressions}
+  \mydefcase{\whilee e e}{while expressions}
+  \\
+  \mydefhead{v ::=\qquad\qquad\qquad\qquad}{Values}
+  \mydefcase{i}{integer values}
+  \mydefcase{b}{boolean values}
+  \\
+  op ::= & + ~|~ - ~|~ * ~|~ / ~|~ > ~|~ >= ~|~ < ~|~ <=  & \mbox{\emph{Binary operators}} \\
+\end{array}
+\]
+\end{figure}
+
+The language for WHILE is given in Figure~\ref{fig:lang}.
+Unlike the Bool* language we discussed previously,
+WHILE supports \emph{mutable references}.
+The state of these references is maintained in a \emph{store},
+a mapping of references to values.
+(``Store'' can be thought of as a synonym for heap.)
+Once we have mutable references, other language constructs become more useful,
+such as sequencing operations ($e_1;e_2$).
+
+
+
+%---------
+\section{Small-step semantics}
+
+\newcommand{\ssrule}[3]{
+  \rel{#1} &
+  \frac{\strut\begin{array}{@{}c@{}} #2 \end{array}}
+       {\strut\begin{array}{@{}c@{}} #3 \end{array}}
+   \\~\\
+}
+\newcommand{\sstep}[4]{\ctxt[{#1}],{#2} \rightarrow \ctxt[{#3}],{#4}}
+\newcommand{\sstepraw}[4]{{#1},{#2} \rightarrow {#3},{#4}}
+\newcommand{\ctxt}{C}
+
+The small-step semantics for WHILE are given in Figure~\ref{fig:smallstep}.
+For the sake of brevity, these rules use \emph{evaluation contexts} ($\ctxt$),
+which specify which \emph{redex} will be evaluated next.
+The evaluation rules then apply to the ``hole'' ($\bullet$) in this context.
+
+Most of these rules are fairly straightforward, but there are a couple of points
+to note with the $\rel{ss-while}$ rule.
+First of all, this is the only rule that makes a more complex expression
+when it has finished.
+%This rule is much cleaner when specified with the big-step operational semantics.
+
+Secondly, note the final value of this expression once the while loop completes.
+It will \emph{always} be {\false} when it completes.
+We could have created a special value, such as {\tt null},
+or we could have made the while loop a statement that returns no value.
+Both choices, however, would complicate our language needlessly.
+
+
+%--------------
+\section{YOUR ASSIGNMENT}
+\newcommand{\bstep}[4]{{#1},{#2} \Downarrow {#3},{#4}}
+
+\noindent
+{\bf Part 1:}
+Rewrite the operational semantic rules for WHILE in \LaTeX\
+to remove the contexts (\ctxt[...])
+and to use evaluation order rules instead.
+Submit both your \LaTeX\ source and the generated PDF file.
+
+Extend your semantics with features to handle boolean values.
+Specifically, add support for:
+\begin{compactitem}
+  \item {\tt and}
+  \item {\tt or}
+  \item {\tt not}
+\end{compactitem}
+
+The exact behavior of these new features is up to you,
+but should seem reasonable to most programmers.
+
+\bigskip
+\noindent
+{\bf Part 2:}
+Once you have your semantics defined,
+download {\tt WhileInterp.hs} and implement the {\tt evaluate} function,
+as well as any additional functions you need.
+Your implementation must be consistent with your operational semantics,
+{\it including your extensions for {\tt and}, {\tt or}, and {\tt not}}.
+Also, you may not change any type signatures provided in the file.
+
+Finally, implement the interpreter to match your semantics.
+
+\bigskip
+\noindent
+{\bf Zip all files together into {\tt hw2.zip} and submit to Canvas.}
+
+
+
+
+
+\begin{figure}[H]\label{fig:smallstep}
+\caption{Small-step semantics for WHILE}
+{\bf Runtime Syntax:}
+\[
+\begin{array}{rclcl}
+  \ctxt & \in & {Context} \quad & ::= & \quad \ctxt; e
+        ~|~ \ctxt ~op~ e
+        ~|~ v ~op~ \ctxt
+        ~|~ \assign{x}{\ctxt}
+        ~|~ \ife{\ctxt}{e_1}{e_2}
+        ~|~ \bullet \\
+  \sigma & \in & {Store} \quad  & = & \quad {variable} ~\rightarrow ~v \\
+  \\
+\end{array}
+\]
+{\bf Evaluation Rules:~~~ \fbox{$\sstepraw{e}{\sigma}{e'}{\sigma'}$}} \\
+\[
+\begin{array}{r@{\qquad\qquad}l}
+\ssrule{ss-var}{
+  x \in domain(\sigma) \qquad \sigma(x)=v
+}{
+  \sstep{x}{\sigma}{v}{\sigma}
+}
+\ssrule{ss-assign}{
+}{
+  \sstep{\assign{x}{v}}{\sigma}{v}{\sigma[x:=v]}
+}
+\ssrule{ss-op}{
+  v = v_1 ~op~ v_2
+}{
+  \sstep{v_1~op~v_2}{\sigma}{v}{\sigma}
+}
+\ssrule{ss-seq}{
+}{
+  \sstep{v;e}{\sigma}{e}{\sigma}
+}
+\ssrule{ss-iftrue}{
+}{
+  \sstep{\ife{\true}{e_1}{e_2}}{\sigma}{e_1}{\sigma}
+}
+\ssrule{ss-iffalse}{
+}{
+  \sstep{\ife{\false}{e_1}{e_2}}{\sigma}{e_2}{\sigma}
+}
+\ssrule{ss-while}{
+}{
+  \sstep{\whilee{e_1}{e_2}}{\sigma}{\ife{e_1}{e_2;\whilee{e_1}{e_2}}{\false}}{\sigma}
+}
+\end{array}
+\]
+\end{figure}
+
+
+
+\end{document}
+
