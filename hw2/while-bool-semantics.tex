@@ -1,0 +1,208 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+
+% Add boxed to figures
+\usepackage{float}
+\floatstyle{boxed}
+\restylefloat{figure}
+
+% Title
+\author{
+  CS 252: Advanced Programming Languages \\
+  Ujjawal Garg \\
+}
+\title{Homework 2: Operational Semantics for WHILE}
+\date{}
+
+\begin{document}
+\maketitle
+
+
+
+% Commands for formatting figure
+\newcommand{\mydefhead}[2]{\multicolumn{2}{l}{{#1}}&\mbox{\emph{#2}}\\}
+\newcommand{\mydefcase}[2]{\qquad\qquad& #1 &\mbox{#2}\\}
+
+% Commands for language format
+\newcommand{\assign}[2]{#1~{:=}~#2}
+\newcommand{\ife}[3]{\mbox{\tt if}~{#1}~\mbox{\tt then}~{#2}~\mbox{\tt else}~{#3}}
+\newcommand{\whilee}[2]{\mbox{\tt while}~(#1)~#2}
+\newcommand{\true}{\mbox{\tt true}}
+\newcommand{\false}{\mbox{\tt false}}
+
+% Commands for evalutation rules
+\newcommand{\rel}[1]{ \mbox{\sc [#1]} }
+\newcommand{\ssrule}[3]{
+  \rel{#1} &
+  \frac{\strut\begin{array}{@{}c@{}} #2 \end{array}}
+       {\strut\begin{array}{@{}c@{}} #3 \end{array}}
+   \\[6pt]
+}
+\newcommand{\sstep}[4]{{#1},{#2} \rightarrow {#3},{#4}}
+
+\begin{figure}[h]
+\caption{The WHILE language}
+\[
+\begin{array}{llr}
+  \mydefhead{e ::=\qquad\qquad\qquad\qquad}{Expressions}
+  \mydefcase{x}{variables/addresses}
+  \mydefcase{v}{values}
+  \mydefcase{\assign x e}{assignment}
+  \mydefcase{e; e}{sequential expressions}
+  \mydefcase{e ~op~ e}{binary operations}
+  \mydefcase{e ~AND~ e}{AND operation}
+  \mydefcase{e ~OR~ e}{OR operation}
+  \mydefcase{e ~NOT~ e}{NOT operation}
+  \mydefcase{\ife e e e}{conditional expressions}
+  \mydefcase{\whilee e e}{while expressions}
+  \\
+  \mydefhead{v ::=\qquad\qquad\qquad\qquad}{Values}
+  \mydefcase{i}{integer values}
+  \mydefcase{b}{boolean values}
+  \\
+  op ::= & + ~|~ - ~|~ * ~|~ / ~|~ > ~|~ >= ~|~ < ~|~ <=  & \mbox{\emph{Binary operators}}
+\end{array}
+\]
+\end{figure}
+
+
+
+\begin{figure}
+\caption{Small-step semantics for WHILE}
+{\bf Runtime Syntax:}
+\[
+\begin{array}{rclcl}
+  \sigma & \in & {Store} \quad  & = & \quad {variable} ~\rightarrow ~v
+\end{array}
+\]
+{\bf Evaluation Rules:~~~ \fbox{$\sstep{e}{\sigma}{e'}{\sigma'}$}} \\
+\[
+\begin{array}{r@{\qquad\qquad}l}
+
+\ssrule{ss-access-red}{
+    x \in domain(\sigma) \qquad \sigma(x)=v
+}{
+    \sstep{x}{\sigma}{v}{\sigma}
+}
+
+\ssrule{ss-assign-context}{
+    \sstep{e}{\sigma}{e'}{\sigma'}
+}{
+    \sstep{\assign{x}{e}}{\sigma}{\assign{x}{e'}}{\sigma'}
+}
+
+\ssrule{ss-assign-red}{
+}{
+    \sstep{\assign{x}{v}}{\sigma}{v}{\sigma[x:=v]}
+}
+
+\ssrule{ss-seq-context}{
+    \sstep{e_1}{\sigma}{e_1'}{\sigma'}
+}{
+    \sstep{e_1;e_2}{\sigma}{e_1';e_2}{\sigma'}
+}
+
+\ssrule{ss-seq-red}{
+}{
+  \sstep{v;e}{\sigma}{e}{\sigma}
+}
+
+
+\ssrule{ss-if-context}{
+ \sstep{e_1}{\sigma}{e_1'}{\sigma'}
+}{
+  \sstep{\ife{e_1}{e_2}{e_3}}{\sigma}{\ife{e_1'}{e_2}{e_3}}{\sigma'}
+}
+
+
+\ssrule{ss-iftrue-red}{
+}{
+  \sstep{\ife{\true}{e_1}{e_2}}{\sigma}{e_1}{\sigma}
+}
+
+\ssrule{ss-iffalse-red}{
+}{
+  \sstep{\ife{\false}{e_1}{e_2}}{\sigma}{e_2}{\sigma}
+}
+
+\ssrule{ss-op-context-1}{
+  \sstep{e_1}{\sigma}{e_1'}{\sigma'}
+}{
+  \sstep{e_1~op~e_2}{\sigma}{e_1'~op~e_2}{\sigma'}
+}
+
+\ssrule{ss-op-context-2}{
+  \sstep{e}{\sigma}{e'}{\sigma'}
+}{
+  \sstep{v~op~e}{\sigma}{v~op~e'}{\sigma'}
+}
+
+\ssrule{ss-op-red}{
+  v = v_1 ~op~ v_2
+}{
+  \sstep{v_1~op~v_2}{\sigma}{v}{\sigma}
+}
+
+\ssrule{ss-and-context}{
+  \sstep{e_1}{\sigma}{e_1'}{\sigma'}
+}{
+  \sstep{e_1~AND~e_2}{\sigma}{e_1'~AND~e_2}{\sigma'}
+}
+
+\ssrule{ss-and-red-1}{
+  \sstep{e}{\sigma}{e'}{\sigma'}
+}{
+  \sstep{\true~AND~e}{\sigma}{e'}{\sigma'}
+}
+
+\ssrule{ss-and-red-2}{
+}{
+  \sstep{\false~AND~e}{\sigma}{\false}{\sigma'}
+}
+
+\ssrule{ss-or-context}{
+  \sstep{e_1}{\sigma}{e_1'}{\sigma'}
+}{
+  \sstep{e_1~OR~e_2}{\sigma}{e_1'~OR~e_2}{\sigma'}
+}
+
+\ssrule{ss-or-red-1}{
+  \sstep{e}{\sigma}{e'}{\sigma'}
+}{
+  \sstep{\false~or~e}{\sigma}{e'}{\sigma'}
+}
+
+\ssrule{ss-or-red-2}{
+}{
+  \sstep{\true~OR~e}{\sigma}{\true}{\sigma'}
+}
+
+\ssrule{ss-not-context}{
+  \sstep{e}{\sigma}{e'}{\sigma'}
+}{
+  \sstep{NOT~e}{\sigma}{NOT~e'}{\sigma'}
+}
+
+\ssrule{ss-not-red-1}{
+}{
+  \sstep{NOT~\true}{\sigma}{\false}{\sigma'}
+}
+
+\ssrule{ss-not-red-2}{
+}{
+  \sstep{NOT~\false}{\sigma}{\true}{\sigma'}
+}
+
+\ssrule{ss-while}{
+}{
+  \sstep{\whilee{e_1}{e_2}}{\sigma}{\ife{e_1}{e_2;\whilee{e_1}{e_2}}{\false}}{\sigma}
+}
+\end{array}
+\]
+\end{figure}
+
+
+
+\end{document}
+

@@ -1,6 +1,10 @@
 import WhileInterp
 
--- Here are a few tests that you can use to check your implementation.
+and_test = NOT (AND (Val (BoolVal True)) (Val (BoolVal True)))
+test = NOT and_test
+or_test = OR and_test test
+
+-- -- Here are a few tests that you can use to check your implementation.
 w_test = (Sequence (Assign "X" (Op Plus (Op Minus (Op Plus (Val (IntVal 1)) (Val (IntVal 2))) (Val (IntVal 3))) (Op Plus (Val (IntVal 1)) (Val (IntVal 3))))) (Sequence (Assign "Y" (Val (IntVal 0))) (While (Op Gt (Var "X") (Val (IntVal 0))) (Sequence (Assign "Y" (Op Plus (Var "Y") (Var "X"))) (Assign "X" (Op Minus (Var "X") (Val (IntVal 1))))))))
 
 w_fact = (Sequence (Assign "N" (Val (IntVal 2))) (Sequence (Assign "F" (Val (IntVal 1))) (While (Op Gt (Var "N") (Val (IntVal 0))) (Sequence (Assign "X" (Var "N")) (Sequence (Assign "Z" (Var "F")) (Sequence (While (Op Gt (Var "X") (Val (IntVal 1))) (Sequence (Assign "F" (Op Plus (Var "Z") (Var "F"))) (Assign "X" (Op Minus (Var "X") (Val (IntVal 1)))))) (Assign "N" (Op Minus (Var "N") (Val (IntVal 1))))))))))
@@ -28,6 +32,8 @@ testUnit = do
 
 main :: IO ()
 main = do
+  -- putStrLn $ show $ WhileInterp.run or_test
+  -- putStrLn $ show $ WhileInterp.run var_test
   testUnit
   -- Should be: fromList [("X",IntVal 0),("Y",IntVal 10)]
   putStrLn $ show $ WhileInterp.testProgram w_test

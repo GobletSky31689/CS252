@@ -1,9 +1,9 @@
 {-
-  Name: <Your name here>
+  Name: Ujjawal Garg
   Class: CS 252
   Assigment: HW2
-  Date: <Date assignment is due>
-  Description: <Describe the program and what it does>
+  Date: 28 Sep 2017
+  Description: An interpreter with integer, boolean and while loop supported
 -}
 
 
@@ -14,6 +14,7 @@ module WhileInterp (
   testProgram,
   run
 ) where
+
 
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -33,6 +34,9 @@ data Expression =
   | Op Binop Expression Expression
   | If Expression Expression Expression     -- if e1 then e2 else e3
   | While Expression Expression             -- while (e1) e2
+  | AND Expression Expression               -- e1 AND e2
+  | OR Expression Expression               -- e1 OR e2
+  | NOT Expression                          -- NOT e1
   deriving (Show)
 
 data Binop =
@@ -57,16 +61,85 @@ data Value =
 -- Be sure to explicitly check for a divide by 0 and throw an error.
 applyOp :: Binop -> Value -> Value -> Value
 applyOp Plus (IntVal i) (IntVal j) = IntVal $ i + j
-applyOp _ _ _ = error "TBD"
+applyOp Minus (IntVal i) (IntVal j) = IntVal $ i - j
+applyOp Times (IntVal i) (IntVal j) = IntVal $ i * j
+applyOp Divide (IntVal i) (IntVal 0) = error "Division by 0 not supported"
+applyOp Divide (IntVal i) (IntVal j) = IntVal $ i `div` j
+applyOp Gt (IntVal i) (IntVal j) = BoolVal $ i > j
+applyOp Ge (IntVal i) (IntVal j) = BoolVal $ i >= j
+applyOp Lt (IntVal i) (IntVal j) = BoolVal $ i < j
+applyOp Le (IntVal i) (IntVal j) = BoolVal $ i <= j
+applyOp _ _ _ = error "Binary operations not supported for Boolean Values"
 
 
 -- Implement this function according to the specified semantics
 evaluate :: Expression -> Store -> (Value, Store)
-evaluate (Op o e1 e2) s =
-  let (v1,s1) = evaluate e1 s
-      (v2,s') = evaluate e2 s1
-  in (applyOp o v1 v2, s')
-evaluate _ _ = error "TBD"
+
+-- This is the base rule
+evaluate (Val val) s = (val, s)
+
+-- [ss-access-red]
+evaluate (Var var) s = case (Map.lookup var s) of
+    Just i -> (i,s)
+    _      -> error ("Key \"" ++ var ++ "\" is not in the map")
+
+-- [ss-seq-red]
+evaluate (Sequence (Val v) e2) s = evaluate e2 s
+-- [ss-seq-context]
+evaluate (Sequence e1 e2) s = evaluate (Sequence (Val e1') e2) s'
+  where (e1', s') = evaluate e1 s
+
+-- [ss-assign-red]
+evaluate (Assign x (Val v)) s = (v, (Map.insert x v s))
+-- [ss-assign-context]
+evaluate (Assign x e) s = evaluate (Assign x (Val e')) s'
+  where (e', s') = evaluate e s
+
+-- [ss-iftrue-red]
+evaluate (If (Val (BoolVal True)) e1 e2) s = evaluate e1 s
+-- [ss-iffalse-red]
+evaluate (If (Val (BoolVal False)) e1 e2) s = evaluate e2 s
+-- [ss-if-context]
+evaluate (If e1 e2 e3) s = evaluate (If (Val e1') e2 e3) s'
+  where (e1', s') = evaluate e1 s
+
+-- [ss-op-red]
+evaluate (Op o (Val v1) (Val v2)) s = (applyOp o v1 v2, s)
+-- [ss-op-context-1]
+evaluate (Op o (Val v1) e) s = evaluate (Op o (Val v1) (Val e')) s'
+  where (e', s') = evaluate e s
+-- [ss-op-context-2]
+evaluate (Op o e1 e2) s = evaluate (Op o (Val e1') e2) s'
+  where (e1', s') = evaluate e1 s
+
+
+evaluate (AND e1 e2) s = case e1 of
+    (Val (BoolVal True)) -> evaluate e2 s
+    (Val (BoolVal False)) -> (BoolVal False, s)
+    _ -> evaluate (AND (Val e1') e2) s' where (e1', s') = evaluate e1 s
+
+evaluate (OR e1 e2) s = case e1 of
+    -- [ss-or-red-1]
+    (Val (BoolVal False)) -> evaluate e2 s
+    -- [ss-or-red-2]
+    (Val (BoolVal True)) -> (BoolVal True, s)
+    -- [ss-or-context]
+    _ -> evaluate (OR (Val e1') e2) s' where (e1', s') = evaluate e1 s
+
+
+evaluate (NOT e) s = case e of
+    -- [ss-or-red-1]
+    (Val (BoolVal False)) -> (BoolVal True, s)
+    -- [ss-or-red-2]
+    (Val (BoolVal True)) -> (BoolVal False, s)
+    -- [ss-or-context]
+    _ -> evaluate (NOT (Val e')) s' where (e', s') = evaluate e s
+
+
+-- [ss-while]
+evaluate (While e1 e2) s = evaluate (If e1 (Sequence e2 (While e1 e2)) (Val (BoolVal False))) s
+
+-- evaluate _ _ = error "TBD"
 
 
 -- Evaluates a program with an initially empty state
