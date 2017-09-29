@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1506665094 "while-bool-semantics.tex" "while-bool-semantics.pdf" "while-bool-semantics" 1506665094
+["pdflatex"] 1506667348 "while-bool-semantics.tex" "while-bool-semantics.pdf" "while-bool-semantics" 1506667349
   "/usr/local/texlive/2017/texmf-dist/fonts/map/fontname/texfonts.map" 1480098670 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2017/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm" 1480098701 1328 c834bbb027764024c09d3d2bf908b5f0 ""
   "/usr/local/texlive/2017/texmf-dist/fonts/tfm/public/cm/cmcsc10.tfm" 1480098701 1300 63a6111ee6274895728663cf4b4e7e81 ""
@@ -34,9 +34,9 @@
   "/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1495593472 2350277 a699055bee05bf8a40b0504752487295 ""
   "/usr/local/texlive/2017/texmf-var/web2c/pdftex/pdflatex.fmt" 1505862586 4129592 b6daeb5462ce1f710207bfb4e836d0bf ""
   "/usr/local/texlive/2017/texmf.cnf" 1495593465 577 2b71d4d888f9e5560b2e99985915a9fa ""
-  "while-bool-semantics.aux" 1506665094 210 9d4530dec0b361bf3b3b7ec28ea5afe2 ""
-  "while-bool-semantics.tex" 1506665093 4213 0ee20bf0c1287809f36bc25828bd816d ""
+  "while-bool-semantics.aux" 1506667349 210 9d4530dec0b361bf3b3b7ec28ea5afe2 ""
+  "while-bool-semantics.tex" 1506667347 4209 157e74a673c5a3a0a858b15c0827d25b ""
   (generated)
+  "while-bool-semantics.log"
   "while-bool-semantics.aux"
   "while-bool-semantics.pdf"
-  "while-bool-semantics.log"

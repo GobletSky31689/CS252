@@ -1,6 +1,6 @@
 import WhileInterp
 
-and_test = NOT (AND (Val (BoolVal True)) (Val (BoolVal True)))
+and_test = (AND (Val (BoolVal True)) (Val (BoolVal True)))
 test = NOT and_test
 or_test = OR and_test test
 
@@ -32,7 +32,7 @@ testUnit = do
 
 main :: IO ()
 main = do
-  -- putStrLn $ show $ WhileInterp.run or_test
+  putStrLn $ show $ WhileInterp.run or_test
   -- putStrLn $ show $ WhileInterp.run var_test
   testUnit
   -- Should be: fromList [("X",IntVal 0),("Y",IntVal 10)]

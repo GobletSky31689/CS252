@@ -158,7 +158,7 @@
 
 \ssrule{ss-and-red-2}{
 }{
-  \sstep{\false~AND~e}{\sigma}{\false}{\sigma'}
+  \sstep{\false~AND~e}{\sigma}{\false}{\sigma}
 }
 
 \ssrule{ss-or-context}{
@@ -175,7 +175,7 @@
 
 \ssrule{ss-or-red-2}{
 }{
-  \sstep{\true~OR~e}{\sigma}{\true}{\sigma'}
+  \sstep{\true~OR~e}{\sigma}{\true}{\sigma}
 }
 
 \ssrule{ss-not-context}{
@@ -186,12 +186,12 @@
 
 \ssrule{ss-not-red-1}{
 }{
-  \sstep{NOT~\true}{\sigma}{\false}{\sigma'}
+  \sstep{NOT~\true}{\sigma}{\false}{\sigma}
 }
 
 \ssrule{ss-not-red-2}{
 }{
-  \sstep{NOT~\false}{\sigma}{\true}{\sigma'}
+  \sstep{NOT~\false}{\sigma}{\true}{\sigma}
 }
 
 \ssrule{ss-while}{

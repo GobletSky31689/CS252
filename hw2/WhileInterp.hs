@@ -3,7 +3,7 @@
   Class: CS 252
   Assigment: HW2
   Date: 28 Sep 2017
-  Description: An interpreter with integer, boolean and while loop supported
+  Description: An interpreter with integers, booleans and while loops supported
 -}
 
 
@@ -74,8 +74,6 @@ applyOp _ _ _ = error "Binary operations not supported for Boolean Values"
 
 -- Implement this function according to the specified semantics
 evaluate :: Expression -> Store -> (Value, Store)
-
--- This is the base rule
 evaluate (Val val) s = (val, s)
 
 -- [ss-access-red]
@@ -113,28 +111,31 @@ evaluate (Op o e1 e2) s = evaluate (Op o (Val e1') e2) s'
   where (e1', s') = evaluate e1 s
 
 
-evaluate (AND e1 e2) s = case e1 of
-    (Val (BoolVal True)) -> evaluate e2 s
-    (Val (BoolVal False)) -> (BoolVal False, s)
-    _ -> evaluate (AND (Val e1') e2) s' where (e1', s') = evaluate e1 s
-
-evaluate (OR e1 e2) s = case e1 of
-    -- [ss-or-red-1]
-    (Val (BoolVal False)) -> evaluate e2 s
-    -- [ss-or-red-2]
-    (Val (BoolVal True)) -> (BoolVal True, s)
-    -- [ss-or-context]
-    _ -> evaluate (OR (Val e1') e2) s' where (e1', s') = evaluate e1 s
+-- [ss-and-red-1]
+evaluate (AND (Val (BoolVal True)) e2) s = evaluate e2 s
+-- [ss-and-red-2]
+evaluate (AND (Val (BoolVal False)) e2) s = (BoolVal False, s)
+-- [ss-and-context]
+evaluate (AND e1 e2) s = evaluate (AND (Val e1') e2) s' 
+  where (e1', s') = evaluate e1 s
 
 
-evaluate (NOT e) s = case e of
-    -- [ss-or-red-1]
-    (Val (BoolVal False)) -> (BoolVal True, s)
-    -- [ss-or-red-2]
-    (Val (BoolVal True)) -> (BoolVal False, s)
-    -- [ss-or-context]
-    _ -> evaluate (NOT (Val e')) s' where (e', s') = evaluate e s
+-- [ss-or-red-1]
+evaluate (OR (Val (BoolVal False)) e2) s = evaluate e2 s
+-- [ss-or-red-2]
+evaluate (OR (Val (BoolVal True)) e2) s = (BoolVal True, s)
+-- [ss-or-context]
+evaluate (OR e1 e2) s = evaluate (OR (Val e1') e2) s' 
+  where (e1', s') = evaluate e1 s
 
+
+-- [ss-not-red-1]
+evaluate (NOT (Val (BoolVal True))) s = (BoolVal False, s)
+-- [ss-not-red-2]
+evaluate (NOT (Val (BoolVal False))) s = (BoolVal True, s)
+-- [ss-not-context]
+evaluate (NOT e) s = evaluate (NOT (Val e')) s' 
+  where (e', s') = evaluate e s
 
 -- [ss-while]
 evaluate (While e1 e2) s = evaluate (If e1 (Sequence e2 (While e1 e2)) (Val (BoolVal False))) s
