@@ -19,19 +19,32 @@
 >	fmap f (Node val left right) =  Node (f val) (fmap f left) (fmap f right) 
 
 
-> data Val v = NothingToSee
->		| VInt v
-> 	deriving (Show)
-
-> instance Functor Val where
->	fmap f NothingToSee = NothingToSee
-> 	fmap f (VInt a) = VInt (f a)
-
-
 Your job is to add support for fmap to this tree, so that the following call works:
+fmap (+1) (Node 3 (Node 1 Empty Empty) (Node 7 (Node 4 Empty Empty) Empty))
 
-fmap ((+1).(+1)) (Val 3)
+Checking Law 1:
+x = (Node 3 (Node 1 Empty Empty) (Node 7 (Node 4 Empty Empty) Empty))
+fmap id x
+Checking Law 2:
+(fmap (+1) . fmap (+1)) x 
+fmap ((+1).(+1)) x
 
 
-fmap ((+1).(+1)) (Node 3 (Node 1 Empty Empty) (Node 7 (Node 4 Empty Empty) Empty))
+
+% > data Val v = NothingToSee
+% >		| VInt v
+% > 	deriving (Show)
+
+% > instance Functor Val where
+% >	fmap f NothingToSee = NothingToSee
+% > fmap f (VInt a) = VInt (f a)
+
+% Checking Law 1:
+% x = (VInt 3)
+% fmap id x
+% Checking Law 2:
+% (fmap (+1) . fmap (+1)) x 
+% fmap ((+1).(+1)) x
+
+
 
