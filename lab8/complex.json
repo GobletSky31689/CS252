@@ -1,0 +1,11 @@
+{
+  name: "Complex number list example",
+  nums: [
+    { real: 42, imaginary: 1 },
+    { real: 30, imaginary: 0 },
+    { real: 15, imaginary: 7 }
+  ],
+  knownIssues: null,
+  verified: false
+}
+  
