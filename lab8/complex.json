@@ -1,5 +1,8 @@
 {
   name: "Complex number list example",
+  comp: {
+  	comp1 : 42
+  },
   nums: [
     { real: 42, imaginary: 1 },
     { real: 30, imaginary: 0 },

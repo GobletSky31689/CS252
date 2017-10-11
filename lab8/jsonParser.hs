@@ -11,40 +11,39 @@ data JValue = JString String
   deriving (Eq, Ord)
 
 
--- instance Show JValue where
---   show (JString str) = "\"" ++ str ++ "\""
---   show (JNumber doub) = show doub
---   show (JBool True) = "true"
---   show (JBool False) = "false"
---   show (JArray lst) = "[\n" ++ items ++ "\n]"
---               where items = intercalate ",\n" (map show lst)
---   show (JNull) = "null"
---   show (JObject []) = "{}"
---   show (JObject lst) = "{\n" ++ items ++ "\n}"
---               where items = intercalate ",\n" ["\t" ++ key ++ " : " ++ value | x <- lst, let key = show (fst x), let value = show (snd x)]
+instance Show JValue where
+  show (JString str) = "\"" ++ str ++ "\""
+  show (JNumber doub) = show doub
+  show (JBool True) = "true"
+  show (JBool False) = "false"
+  show (JArray lst) = "[\n" ++ items ++ "\n]"
+              where items = intercalate ",\n" (map show lst)
+  show (JNull) = "null"
+  show (JObject []) = "{}"
+  show (JObject lst) = "{\n" ++ items ++ "\n}"
+              where items = intercalate ",\n" ["\t" ++ key ++ " : " ++ value | x <- lst, let key = (fst x), let value = show (snd x)]
 
 
 
-prettify :: JValue -> String
-prettify x = prettyPrint' 0 x
+-- prettify :: JValue -> String
+-- prettify x = prettyPrint' 0 x
 
 
--- prettyPrint :: Integer -> JValue -> String
--- prettyPrint' indentLevel x = indents ++ (printVal x)
---               where indents = addTabs indentLevel
-
-prettyPrint' :: Integer -> JValue -> String
-prettyPrint' indentLevel (JString str) = (addTabs indentLevel) ++ "\"" ++ str ++ "\""
-prettyPrint' indentLevel (JNumber doub) = (addTabs indentLevel) ++ show doub
-prettyPrint' indentLevel (JBool True) = (addTabs indentLevel) ++ "true"
-prettyPrint' indentLevel (JBool False) = (addTabs indentLevel) ++ "false"
-prettyPrint' indentLevel (JArray lst) = (addTabs indentLevel) ++ "[\n" ++ items ++ "\n]"
-             where newTabs = (addTabs indentLevel)
-                   items = intercalate (",\n"++newTabs) (map prettify lst)
-prettyPrint' indentLevel (JNull) = (addTabs indentLevel) ++ "null"
-prettyPrint' indentLevel (JObject []) = (addTabs indentLevel) ++ "{}"
-prettyPrint' indentLevel (JObject lst) = (addTabs indentLevel) ++ "{\n" ++ items ++ "\n}"
-            where items = intercalate ",\n" ["\t" ++ key ++ " : " ++ value | x <- lst, let key = show (fst x), let value = prettify (snd x)]
+-- prettyPrint' :: Integer -> JValue -> String
+-- prettyPrint' indentLevel (JString str) = (addTabs indentLevel) ++ "\"" ++ str ++ "\""
+-- prettyPrint' indentLevel (JNumber doub) = (addTabs indentLevel) ++ show doub
+-- prettyPrint' indentLevel (JBool True) = (addTabs indentLevel) ++ "true"
+-- prettyPrint' indentLevel (JBool False) = (addTabs indentLevel) ++ "false"
+-- prettyPrint' indentLevel (JArray lst) = oldTabs ++ "[\n" ++ newTabs ++ items ++ "\n" ++ oldTabs ++ "]"
+--              where oldTabs = addTabs indentLevel
+--                    newTabs = (addTabs (indentLevel+1))
+--                    items = intercalate (",\n"++newTabs) (map (prettyPrint' indentLevel) lst)
+-- prettyPrint' indentLevel (JNull) = (addTabs indentLevel) ++ "null"
+-- prettyPrint' indentLevel (JObject []) = (addTabs indentLevel) ++ "{}"
+-- prettyPrint' indentLevel (JObject lst) = oldTabs ++ "{\n" ++ newTabs ++ items ++ "\n" ++ oldTabs ++ "}"
+--             where oldTabs = addTabs indentLevel
+--                   newTabs = (addTabs (indentLevel+1))
+--                   items = intercalate (",\n"++newTabs) [key ++ " : " ++ value | x <- lst, let key = show (fst x), let value = (prettyPrint' indentLevel) (snd x)]
 
 
 
@@ -140,6 +139,6 @@ main = do
   p <- parseFromFile jsonFile (head args)
   case p of
     Left err  -> print err
-    Right json -> putStrLn (prettify json)
+    Right json -> print json -- putStrLn (prettify json)
 
 
