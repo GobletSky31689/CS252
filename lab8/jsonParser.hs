@@ -12,7 +12,7 @@ data JValue = JString String
 
 
 instance Show JValue where
-  show (JString str) = str
+  show (JString str) = "\"" ++ str ++ "\""
   show (JNumber doub) = show doub
   show (JBool True) = "true"
   show (JBool False) = "false"
