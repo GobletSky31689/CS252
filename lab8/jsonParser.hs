@@ -43,7 +43,7 @@ instance Show JValue where
 -- prettyPrint' indentLevel (JObject lst) = oldTabs ++ "{\n" ++ newTabs ++ items ++ "\n" ++ oldTabs ++ "}"
 --             where oldTabs = addTabs indentLevel
 --                   newTabs = (addTabs (indentLevel+1))
---                   items = intercalate (",\n"++newTabs) [key ++ " : " ++ value | x <- lst, let key = show (fst x), let value = (prettyPrint' indentLevel) (snd x)]
+--                   items = intercalate (",\n"++newTabs) [key ++ " : " ++ value | x <- lst, let key = (fst x), let value = (prettyPrint' indentLevel) (snd x)]
 
 
 
