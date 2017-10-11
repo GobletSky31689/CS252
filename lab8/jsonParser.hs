@@ -1,5 +1,6 @@
 import Text.ParserCombinators.Parsec
 import System.Environment
+import Data.List (intercalate)
 
 data JValue = JString String
             | JNumber Double
@@ -7,7 +8,19 @@ data JValue = JString String
             | JNull
             | JObject [(String, JValue)]
             | JArray [JValue]
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+
+instance Show JValue where
+  show (JString str) = str
+  show (JNumber doub) = show doub
+  show (JBool True) = "true"
+  show (JBool False) = "false"
+  show (JArray lst) = show lst
+  show (JNull) = "null"
+  show (JObject []) = "{}"
+  show (JObject lst) = "{" ++ items ++ "}"
+                  where items = intercalate "," [key ++ ":" ++ value | x <- lst, let key = show (fst x), let value = show (snd x)]
 
 
 
