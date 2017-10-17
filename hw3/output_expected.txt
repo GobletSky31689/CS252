@@ -1,0 +1,19 @@
+***Testing abs.imp
+Sequence (Assign "X" (Op Minus (Val (IntVal 0)) (Val (IntVal 3)))) (If (Op Lt (Var "X") (Val (IntVal 0))) (Assign "X" (Op Minus (Val (IntVal 0)) (Var "X"))) (Val (BoolVal False)))
+"fromList [(\"X\",IntVal 3)]"
+
+***Testing fact.imp
+Sequence (Assign "N" (Val (IntVal 2))) (Sequence (Assign "F" (Val (IntVal 1))) (While (Op Gt (Var "N") (Val (IntVal 0))) (Sequence (Assign "X" (Var "N")) (Sequence (Assign "Z" (Var "F")) (Sequence (While (Op Gt (Var "X") (Val (IntVal 1))) (Sequence (Assign "F" (Op Plus (Var "Z") (Var "F"))) (Assign "X" (Op Minus (Var "X") (Val (IntVal 1)))))) (Assign "N" (Op Minus (Var "N") (Val (IntVal 1)))))))))
+"fromList [(\"F\",IntVal 2),(\"N\",IntVal 0),(\"X\",IntVal 1),(\"Z\",IntVal 2)]"
+
+***Testing times.imp
+Sequence (Assign "X" (Val (IntVal 10))) (Sequence (Assign "Y" (Val (IntVal 3))) (Sequence (Assign "Z" (Val (IntVal 0))) (While (Op Gt (Var "X") (Val (IntVal 0))) (Sequence (Assign "Z" (Op Plus (Var "Z") (Var "Y"))) (Assign "X" (Op Minus (Var "X") (Val (IntVal 1))))))))
+"fromList [(\"X\",IntVal 0),(\"Y\",IntVal 3),(\"Z\",IntVal 30)]"
+
+***Testing test.imp
+Sequence (Assign "X" (Op Plus (Op Minus (Op Plus (Val (IntVal 1)) (Val (IntVal 2))) (Val (IntVal 3))) (Op Plus (Val (IntVal 1)) (Val (IntVal 3))))) (Sequence (Assign "Y" (Val (IntVal 0))) (While (Op Gt (Var "X") (Val (IntVal 0))) (Sequence (Assign "Y" (Op Plus (Var "Y") (Var "X"))) (Assign "X" (Op Minus (Var "X") (Val (IntVal 1)))))))
+"fromList [(\"X\",IntVal 0),(\"Y\",IntVal 10)]"
+
+***Testing error.imp
+Sequence (Assign "x" (Op Plus (Val (IntVal 7)) (Val (IntVal 3)))) (If (Var "x") (Val (BoolVal True)) (Val (BoolVal False)))
+test.hs: Non-boolean value '10' used as a conditional

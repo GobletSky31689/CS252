@@ -1,0 +1,7 @@
+x := 7 + 3;
+if x then
+  true
+else
+  false
+endif
+
