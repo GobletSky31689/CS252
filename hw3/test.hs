@@ -2,8 +2,8 @@ import WhileInterp
 
 test f = do
   putStrLn $ "***Testing " ++ f
-  showParsedExp f
-  -- runFile f
+  -- showParsedExp f
+  runFile f
   putStrLn ""
 
 main :: IO ()

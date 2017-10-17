@@ -20,6 +20,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 import Control.Monad.Except
+import System.Environment
 
 -- We represent variables as strings.
 type Variable = String
@@ -189,7 +190,16 @@ parenP = do
 -- The first case is done for you.
 applyOp :: Binop -> Value -> Value -> Either ErrorMsg Value
 applyOp Plus (IntVal i) (IntVal j) = Right $ IntVal $ i + j
-applyOp _ _ _ = error "TBD"
+applyOp Minus (IntVal i) (IntVal j) = Right $ IntVal $ i - j
+applyOp Times (IntVal i) (IntVal j) = Right $ IntVal $ i * j
+applyOp Divide (IntVal i) (IntVal 0) = Left $  "Division by 0 not supported"
+applyOp Divide (IntVal i) (IntVal j) = Right $ IntVal $ i `div` j
+applyOp Gt (IntVal i) (IntVal j) = Right $ BoolVal $ i > j
+applyOp Ge (IntVal i) (IntVal j) = Right $ BoolVal $ i >= j
+applyOp Lt (IntVal i) (IntVal j) = Right $ BoolVal $ i < j
+applyOp Le (IntVal i) (IntVal j) = Right $ BoolVal $ i <= j
+applyOp _ _ _ = Left $ "Binary operations not supported for Boolean Values"
+
 
 
 -- As with the applyOp method, the semantics for this function
@@ -201,7 +211,35 @@ evaluate (Op o e1 e2) s = do
   (v2,s') <- evaluate e2 s1
   v <- applyOp o v1 v2
   return (v, s')
-evaluate _ _ = error "TBD"
+
+evaluate (Var var) s = case (Map.lookup var s) of
+    Just i -> return (i,s)
+    _      -> Left ("Key \"" ++ var ++ "\" is not in the map")
+
+
+evaluate (Assign x e) s = case (evaluate e s) of 
+    Right (v, s') -> return (v, (Map.insert x v s'))
+    Left msg                  -> Left msg --("Invalid Expression on RHS\n" ++ msg)
+
+
+evaluate (If e1 e2 e3) s = case (evaluate e1 s) of
+  Right (BoolVal True, s') -> evaluate e2 s'
+  Right (BoolVal False, s') -> evaluate e3 s'
+  Right (IntVal i, s')      -> Left ("Non-boolean value '" ++ (show i) ++ "' used as a conditional")
+  Left msg                  ->  Left msg --("Invalid Expression " ++ show (e1) ++ " as conditional\n" ++ msg)
+
+
+evaluate (Sequence e1 e2) s = case (evaluate e1 s) of
+  Right (v, s') -> evaluate e2 s'
+  Left msg -> Left msg --("Error evaluating: " ++ (show e1) ++ "\n" ++ msg)
+
+
+evaluate (While e1 e2) s = evaluate (If e1 (Sequence e2 (While e1 e2)) (Val (BoolVal False))) s
+
+
+evaluate (Val val) s = return (val, s)
+
+-- evaluate _ _ = error "TBD"
 
 
 -- Evaluates a program with an initially empty state
@@ -218,9 +256,12 @@ runFile fileName = do
   p <- parseFromFile fileP fileName
   case p of
     Left parseErr -> print parseErr
-    Right exp ->
+    Right exp -> do
+      print exp
       case (run exp) of
-        Left msg -> print msg
+        Left msg -> do
+          progName <- getProgName
+          putStr (progName ++ ": " ++ msg)
         Right (v,s) -> print $ show s
 
 
