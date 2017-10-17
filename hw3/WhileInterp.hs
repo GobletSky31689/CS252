@@ -1,9 +1,9 @@
 {-
-  Name: <Your name here>
+  Name: Ujjawal Garg
   Class: CS 252
   Assigment: HW3
-  Date: <Date assignment is due>
-  Description: <Describe the program and what it does>
+  Date: 16 October 2017
+  Description: 
 -}
 
 
@@ -140,16 +140,46 @@ boolP = do
     "false" -> BoolVal False
     "skip" -> BoolVal False -- Treating the command 'skip' as a synonym for false, for ease of parsing
 
-numberP = error "TBD"
+numberP = do
+  n <- many1 digit
+  return $ IntVal (read n) 
 
-varP = error "TBD"
+varP = do
+  firstChar <- letter
+  v <- many alphaNum
+  return $ Var (firstChar:v)
 
-ifP = error "TBD"
+ifP = do
+  string "if"
+  e1 <- exprP --' <|> valP
+  string "then"
+  e2 <- exprP --' <|> valP
+  string "else"
+  e3 <- exprP --' <|> valP
+  string "endif"
+  return $ If e1 e2 e3
 
-whileP = error "TBD"
+
+
+whileP = do
+  string "while"
+  e1 <- exprP
+  string "do"
+  e2 <- exprP
+  string "endwhile"
+  return $ While e1 e2
+
 
 -- An expression in parens, e.g. (9-5)*2
-parenP = error "TBD"
+parenP = do
+  string "("
+  e <- exprP
+  string ")"
+  rest <- optionMaybe restP
+  spaces
+  return (case rest of
+    Nothing -> e
+    Just (op, e') -> Op (transOp op) e e')
 
 
 -- This function will be useful for defining binary operations.
@@ -192,4 +222,5 @@ runFile fileName = do
       case (run exp) of
         Left msg -> print msg
         Right (v,s) -> print $ show s
+
 
