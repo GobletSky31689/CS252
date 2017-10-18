@@ -3,7 +3,8 @@
   Class: CS 252
   Assigment: HW3
   Date: 16 October 2017
-  Description: 
+  Description: This interepreter reads a imperative language "imp", and parses it into a semantic that our
+  previous Haskell program (HW2) could understand.
 -}
 
 
@@ -262,6 +263,6 @@ runFile fileName = do
         Left msg -> do
           progName <- getProgName
           putStr (progName ++ ": " ++ msg)
-        Right (v,s) -> print $ show s
+        Right (v,s) -> print $ show s --It should be print s, adding show escapes the quotes unnecessarily
 
 
