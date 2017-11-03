@@ -6,4 +6,3 @@ var r = Rabbit("Python");
 
 console.log(r.name);  // ERROR!!!
 console.log(name);    // Prints "Python"
-
