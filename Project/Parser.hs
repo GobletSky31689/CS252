@@ -1,0 +1,168 @@
+import Data.Map (Map)
+import qualified Data.Map as Map
+import Text.ParserCombinators.Parsec
+import System.Environment
+
+
+
+data Type
+    = PrimType Primitives
+    | ClassRefType Identifier
+    -- | ArrayType Type
+  deriving (Eq,Show,Read)
+
+data Primitives
+    = BooleanType
+    | ByteType
+    | ShortType
+    | IntType
+    | LongType
+    | CharType
+    | FloatType
+    | DoubleType
+  deriving (Eq,Show,Read)
+
+
+data BinOp =
+    Plus     -- +  :: Int  -> Int  -> Int
+  | Minus    -- -  :: Int  -> Int  -> Int
+  | Times    -- *  :: Int  -> Int  -> Int
+  | Divide   -- /  :: Int  -> Int  -> Int
+  | Gt       -- >  :: Int -> Int -> Bool
+  | Ge       -- >= :: Int -> Int -> Bool
+  | Lt       -- <  :: Int -> Int -> Bool
+  | Le       -- <= :: Int -> Int -> Bool
+  deriving (Eq,Show,Read)
+
+data Literal = JInt Integer
+		    | JBool Bool
+  			deriving (Eq,Show,Read)
+
+data Variable = Variable Type Name
+			deriving (Eq,Show,Read)
+
+data Exp = Lit Literal
+	    	| Var Variable
+	    	| Assign Variable Exp
+	    	| Sequence Exp Exp 
+	    	| Op BinOp Exp Exp
+	    	deriving (Eq,Show,Read)
+
+
+--  A single identifier.
+data Identifier = Identifier String
+    deriving (Eq,Show,Read)
+
+-- '.' separated string. It could be a package, field, method, class
+-- e.g. java.lang.System package or BigInteger.ONE field etc
+data Name = Name [Identifier]
+    deriving (Eq,Show,Read)
+
+
+transOp s = case s of
+  "+"  -> Plus
+  "-"  -> Minus
+  "*"  -> Times
+  "/"  -> Divide
+  ">=" -> Ge
+  ">"  -> Gt
+  "<=" -> Le
+  "<"  -> Lt
+  o    -> error $ "Unexpected operator " ++ o
+
+
+transType s = case s of
+  "bool"  -> PrimType BooleanType
+  "byte"  -> PrimType ByteType
+  "short"  -> PrimType ShortType
+  "int"  -> PrimType IntType
+  "long" -> PrimType LongType
+  "char"  -> PrimType CharType
+  "double"  -> PrimType DoubleType
+  o    -> ClassRefType (Identifier o)
+
+
+
+fileP :: GenParser Char st Exp
+fileP = do
+  prog <- exprP
+  eof
+  return prog
+
+
+exprP = do
+  e <- exprP'
+  rest <- optionMaybe restSeqP
+  return (case rest of
+    Nothing -> e
+    Just e' -> Sequence e e')
+
+
+exprP' = do
+  spaces
+  t <- termP
+  spaces
+  rest <- optionMaybe restP
+  spaces
+  return (case rest of
+    Nothing   -> t
+    Just ("=", t') -> (case t of
+      Var varName -> Assign varName t'
+      _           -> error "Expected var")
+    Just (op, t') -> Op (transOp op) t t')
+
+
+restP = do
+  ch <- string "+"
+    <|> string "-"
+    <|> string "*"
+    <|> string "/"
+    <|> try (string "<=")
+    <|> string "<"
+    <|> try (string ">=")
+    <|> string ">"
+    <|> string "=" -- not really a binary operator, but it fits in nicely here.
+    <?> "binary operator"
+  e <- exprP'
+  return (ch, e)
+
+
+
+restSeqP = do
+  char ';'
+  exprP
+
+termP = valP
+    <|> varP
+    <?> "value, variable"
+
+valP = do
+  v <- boolP <|> numberP
+  return $ Lit v
+
+
+boolP = do
+  bStr <- string "True" <|> string "False"
+  return $ case bStr of
+    "True" -> JBool True
+    "False" -> JBool False
+
+numberP = do
+  n <- many1 digit
+  return $ JInt (read n)
+
+varP = do
+  typeStr <- many1 alphaNum
+  spaces
+  firstChar <- letter
+  v <- many alphaNum
+  let s = firstChar:v
+  return $ Var (Variable (transType typeStr) (Name [Identifier s]))
+
+showParsedExp fileName = do
+  p <- parseFromFile fileP fileName
+  case p of
+    Left parseErr -> print parseErr
+    Right exp -> print exp
+
+

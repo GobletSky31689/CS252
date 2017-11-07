@@ -11,7 +11,6 @@ srvr.on('connection', function(client) {
 
   client.on('data', function(data) {
     var strData = data.toString('utf8').trim();
-    console.log(strData);
     if(strData === '\\list'){
 
       client.write("List of Users:\n");
@@ -22,13 +21,12 @@ srvr.on('connection', function(client) {
 
     } else if (strData.startsWith('\\rename')) {
        
-       var start = strData.indexOf('<')+1;
-       var end = strData.indexOf('>');
-       if(start<=0 || end <=0){
+       var start = strData.indexOf(' ')+1;
+       if(start<=0){
           client.write("Invalid Command!\n");
        } else {
           var msg = client.name + ' is now ';
-          client.name = strData.substring(start, end);
+          client.name = strData.substring(start).trim();
           msg += client.name + '\n';
           for (var i in clientList) {
              clientList[i].write(msg);
@@ -37,13 +35,13 @@ srvr.on('connection', function(client) {
        
     }
     else if(strData.startsWith('\\private')) {
-        tokens = strData.split("<");
-        if(tokens.length !== 3 || !tokens[1].trim().endsWith('>') || !tokens[2].trim().endsWith('>')) {
+        startName = strData.indexOf(' ')+1;
+        startMsg = strData.indexOf(' ', startName)+1;
+        if(start<=0 || startMsg <=0) {
            client.write("Invalid Command!\n");
         } else {
-          rec_name = tokens[1].substring(0, tokens[1].length-2);
-          p_msg = tokens[2].substring(0, tokens[2].length-2)+"\n";
-          console.log(p_msg + " " + rec_name);
+          rec_name = strData.substring(startName, startMsg).trim();
+          p_msg = strData.substring(startMsg).trim()+"\n";
           private_msg(p_msg, rec_name, client.name);
         }
     }
