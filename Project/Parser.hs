@@ -1,22 +1,25 @@
-import Data.Map (Map)
-import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
-import System.Environment
 
 -- package com.gobletsky.obfuscator;
 data PackageDecl = PackageDecl Name
-  deriving (Eq,Show,Read)
+  	deriving (Eq,Show,Read)
+
+data Statement = Declare VarDecl (Maybe Exp)
+				| Assign VarAcc Exp
+		    	| Sequence Statement Statement 
+	deriving (Eq,Show,Read)
 
 -- Only supporting few expressions for now.
 data Exp = Lit Literal
-	    	| Var Variable
-	    	| Assign Variable Exp
-	    	| Sequence Exp Exp 
+	    	| Var VarAcc
 	    	| Op BinOp Exp Exp
 	    	deriving (Eq,Show,Read)
 
--- Any variable object
-data Variable = Variable Type Name
+-- An variable declaration
+data VarDecl = VarDecl Type Name
+			deriving (Eq,Show,Read)
+
+data VarAcc = VarAcc Name
 			deriving (Eq,Show,Read)
 
 --  A single identifier. Could be a variable, className etc
@@ -50,6 +53,7 @@ data Primitives
 
 -- This is different from Primitive types above. Primitive define "type" of variable.
 -- Literal are "fixed" values, that would be assigned to these variables.
+-- TODO: Add String literal support
 data Literal = Int Integer
 		    | Boolean Bool
 		    | Real Double
@@ -77,6 +81,7 @@ packageNameP = do
 	string "package"
 	spaces
 	x <- singleString `sepBy` (char '.')
+	spaces
 	char ';'
 	spaces
 	return $ PackageDecl (Name [Identifier x1 | x1 <- x])
@@ -86,11 +91,11 @@ packageNameP = do
 -- Java Program like PackageDel -> ImportStmts -> ClassDecls
 -- ClassDecls can further have FieldDecls and MethodDecls
 -- MethoodDecls can further have sequence of Exp
-fileP :: GenParser Char st Exp
+fileP :: GenParser Char st Statement
 fileP = do
   -- TODO: use it when heirarchy is defines
   pkgName <- optionMaybe packageNameP
-  prog <- exprP
+  prog <- statementP
   eof
   return prog
 
@@ -122,26 +127,54 @@ transType s = case s of
 
 
 -- Parse a sequence of statements
-exprP = do
-  e <- exprP'
+statementP :: GenParser Char st Statement
+statementP = do
+  e <- statementP'
   rest <- optionMaybe restSeqP
   return (case rest of
     Nothing -> e
     Just e' -> Sequence e e')
 
+restSeqP :: GenParser Char st Statement
+restSeqP = do
+  char ';'
+  statementP
+
 -- Parse a single statement
-exprP' = do
+statementP' :: GenParser Char st Statement
+statementP' = do
   spaces
-  t <- termP
+  -- Only Variable Declaration & Assignment statements supported for now
+  -- TODO: Changing the order of assign & Decl causes errors. Can it be fixed??
+  stmnt <- varAssignDeclP
   spaces
-  rest <- optionMaybe restP
+  return stmnt
+
+
+varAssignDeclP :: GenParser Char st Statement
+varAssignDeclP = do
+  var <- varP
   spaces
-  return (case rest of
-    Nothing   -> t
-    Just ("=", t') -> (case t of
-      Var varName -> Assign varName t'
-      _           -> error "Expected var")
-    Just (op, t') -> Op (transOp op) t t')
+  isAssignStmt <- optionMaybe (char '=')
+  spaces
+  case isAssignStmt of 
+   			Just x -> do
+   				expr <- exprP
+   				return $ Assign (VarAcc (Name [Identifier var])) expr
+   			Nothing -> do
+  	        	var' <- varP
+  	        	return $ Declare (VarDecl (transType var) (Name [Identifier var'])) Nothing
+  
+
+exprP :: GenParser Char st Exp
+exprP = do
+	spaces
+	lExpr <- (transrVar varP) <|> valP
+	spaces
+	rest <- optionMaybe restP
+	return (case rest of
+	    Nothing   -> lExpr
+	    Just (op, rExpr) -> Op (transOp op) lExpr rExpr)
 
 
 restP = do
@@ -153,20 +186,30 @@ restP = do
     <|> string "<"
     <|> try (string ">=")
     <|> string ">"
-    <|> string "=" -- not really a binary operator, but it fits in nicely here.
+    -- <|> string "=" -- not really a binary operator, but it fits in nicely here.
     <?> "binary operator"
-  e <- exprP'
+  e <- exprP
   return (ch, e)
 
+varP = do
+  spaces
+  firstChar <- letter
+  v <- many alphaNum
+  let s = firstChar:v
+  return s
 
 
-restSeqP = do
-  char ';'
-  exprP
+transrVar s = do
+	str <- s
+	return $ Var (VarAcc (Name [Identifier str]))
 
-termP = valP
-    <|> varP
-    <?> "value, variable"
+-- translVar s = do
+-- 	str <- s
+-- 	return $ (VarAcc (Name [Identifier str]))
+
+
+
+
 
 valP = do
   v <- boolP <|> numberP
@@ -188,13 +231,6 @@ numberP = do
   		f <- many1 digit
   		return $ Real (read (n ++ "." ++ f))
 
-varP = do
-  typeStr <- many1 alphaNum
-  spaces
-  firstChar <- letter
-  v <- many alphaNum
-  let s = firstChar:v
-  return $ Var (Variable (transType typeStr) (Name [Identifier s]))
 
 showParsedExp fileName = do
   p <- parseFromFile fileP fileName

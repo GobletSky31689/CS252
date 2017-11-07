@@ -1,2 +1,3 @@
 package com.gobletsky.obfuscator;
-BigInteger bigInt = 2.0
+Integer myint;
+myint = 2
