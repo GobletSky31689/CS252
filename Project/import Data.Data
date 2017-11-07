@@ -3,12 +3,11 @@ import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 import System.Environment
 
-
--- package com.gobletsky.obfuscator;
 data PackageDecl = PackageDecl Name
   deriving (Eq,Show,Read)
 
--- TODO: Add support for Array Types
+
+-- Add support for Array Types
 data Type
     = PrimType Primitives
     | ClassRefType Identifier
@@ -27,26 +26,18 @@ data Primitives
 
 
 data BinOp =
-    Plus
-  | Minus
-  | Times
-  | Divide
-  | Gt
-  | Ge
-  | Lt
-  | Le
+    Plus     -- +  :: Int  -> Int  -> Int
+  | Minus    -- -  :: Int  -> Int  -> Int
+  | Times    -- *  :: Int  -> Int  -> Int
+  | Divide   -- /  :: Int  -> Int  -> Int
+  | Gt       -- >  :: Int -> Int -> Bool
+  | Ge       -- >= :: Int -> Int -> Bool
+  | Lt       -- <  :: Int -> Int -> Bool
+  | Le       -- <= :: Int -> Int -> Bool
   deriving (Eq,Show,Read)
-
-
 
 data Literal = JInt Integer
 		    | JBool Bool
-		    | JByte Int
-		    | JShort Int
-		    | JLong Integer
-		    | JChar Char
-		    | JFloat Double
-		    | JDouble Double
   			deriving (Eq,Show,Read)
 
 data Variable = Variable Type Name

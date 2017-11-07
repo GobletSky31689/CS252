@@ -1,33 +1,6 @@
 module Tokens where
 
-data Type
-    = PrimType Primitives
-    | RefType References
-  deriving (Eq,Show,Read)
 
-data Primitives
-    = BooleanType
-    | ByteType
-    | ShortType
-    | IntType
-    | LongType
-    | CharType
-    | FloatType
-    | DoubleType
-  deriving (Eq,Show,Read)
-
-data References
-    = ClassRefType Identifier
-    | ArrayType Type
-  deriving (Eq,Show,Read)
-
---  A single identifier.
-data Identifier = Identifier String
-    deriving (Eq,Show,Read)
-
---  A package Name.
-data Name = Name [Identifier]
-    deriving (Eq,Show,Read)
 
 data CompilationUnit = CompilationUnit (Maybe PackageDecl) [ImportDecl] [ClassDecl]
   deriving (Eq,Show,Read)
