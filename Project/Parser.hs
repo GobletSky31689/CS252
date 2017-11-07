@@ -3,12 +3,35 @@ import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 import System.Environment
 
-
 -- package com.gobletsky.obfuscator;
 data PackageDecl = PackageDecl Name
   deriving (Eq,Show,Read)
 
+-- Only supporting few expressions for now.
+data Exp = Lit Literal
+	    	| Var Variable
+	    	| Assign Variable Exp
+	    	| Sequence Exp Exp 
+	    	| Op BinOp Exp Exp
+	    	deriving (Eq,Show,Read)
+
+-- Any variable object
+data Variable = Variable Type Name
+			deriving (Eq,Show,Read)
+
+--  A single identifier. Could be a variable, className etc
+data Identifier = Identifier String
+    deriving (Eq,Show,Read)
+
+-- '.' separated string. It could be a package, field, method, class
+-- e.g. java.lang.System package or BigInteger.ONE field etc
+-- Will mostly use Name instead of Identifier as 
+-- it is more broader
+data Name = Name [Identifier]
+    deriving (Eq,Show,Read)
+
 -- TODO: Add support for Array Types
+-- There can be two types of variables: Primitive, ClassReference
 data Type
     = PrimType Primitives
     | ClassRefType Identifier
@@ -25,9 +48,15 @@ data Primitives
     | DoubleType
   deriving (Eq,Show,Read)
 
+-- This is different from Primitive types above. Primitive define "type" of variable.
+-- Literal are "fixed" values, that would be assigned to these variables.
+data Literal = Int Integer
+		    | Boolean Bool
+		    | Real Double
+  			deriving (Eq,Show,Read)
 
-data BinOp =
-    Plus
+-- same as HW3
+data BinOp = Plus
   | Minus
   | Times
   | Divide
@@ -36,39 +65,6 @@ data BinOp =
   | Lt
   | Le
   deriving (Eq,Show,Read)
-
-
-
-data Literal = JInt Integer
-		    | JBool Bool
-		    | JByte Int
-		    | JShort Int
-		    | JLong Integer
-		    | JChar Char
-		    | JFloat Double
-		    | JDouble Double
-  			deriving (Eq,Show,Read)
-
-data Variable = Variable Type Name
-			deriving (Eq,Show,Read)
-
-data Exp = Lit Literal
-	    	| Var Variable
-	    	| Assign Variable Exp
-	    	| Sequence Exp Exp 
-	    	| Op BinOp Exp Exp
-	    	deriving (Eq,Show,Read)
-
-
---  A single identifier.
-data Identifier = Identifier String
-    deriving (Eq,Show,Read)
-
--- '.' separated string. It could be a package, field, method, class
--- e.g. java.lang.System package or BigInteger.ONE field etc
-data Name = Name [Identifier]
-    deriving (Eq,Show,Read)
-
 
 
 singleString :: GenParser Char st String
@@ -85,15 +81,21 @@ packageNameP = do
 	spaces
 	return $ PackageDecl (Name [Identifier x1 | x1 <- x])
 
+
+-- TODO: Create a ADT that simulates the heirarchy of a typical
+-- Java Program like PackageDel -> ImportStmts -> ClassDecls
+-- ClassDecls can further have FieldDecls and MethodDecls
+-- MethoodDecls can further have sequence of Exp
 fileP :: GenParser Char st Exp
 fileP = do
+  -- TODO: use it when heirarchy is defines
   pkgName <- optionMaybe packageNameP
   prog <- exprP
   eof
   return prog
 
 
-
+-- Utility function to transform string to BinOp
 transOp s = case s of
   "+"  -> Plus
   "-"  -> Minus
@@ -105,7 +107,7 @@ transOp s = case s of
   "<"  -> Lt
   o    -> error $ "Unexpected operator " ++ o
 
-
+-- Utility function to transform string to Type
 transType s = case s of
   "bool"  -> PrimType BooleanType
   "byte"  -> PrimType ByteType
@@ -116,7 +118,10 @@ transType s = case s of
   "double"  -> PrimType DoubleType
   o    -> ClassRefType (Identifier o)
 
+-- TODO: create transforms functions for other keywords
 
+
+-- Parse a sequence of statements
 exprP = do
   e <- exprP'
   rest <- optionMaybe restSeqP
@@ -124,7 +129,7 @@ exprP = do
     Nothing -> e
     Just e' -> Sequence e e')
 
-
+-- Parse a single statement
 exprP' = do
   spaces
   t <- termP
@@ -171,13 +176,17 @@ valP = do
 boolP = do
   bStr <- string "True" <|> string "False"
   return $ case bStr of
-    "True" -> JBool True
-    "False" -> JBool False
+    "True" -> Boolean True
+    "False" -> Boolean False
 
 numberP = do
   n <- many1 digit
-  return $ JInt (read n)
-
+  isFloat <- optionMaybe (char '.')
+  case isFloat of
+  	Nothing -> return $ Int (read n)
+  	Just x -> do
+  		f <- many1 digit
+  		return $ Real (read (n ++ "." ++ f))
 
 varP = do
   typeStr <- many1 alphaNum
