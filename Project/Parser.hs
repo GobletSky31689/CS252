@@ -91,6 +91,10 @@ packageNameP = do
 -- Java Program like PackageDel -> ImportStmts -> ClassDecls
 -- ClassDecls can further have FieldDecls and MethodDecls
 -- MethoodDecls can further have sequence of Exp
+-- E.g. somethin like this:
+-- data JavaPrg = (Maybe PackageDecl) [ImportStmt] [ClassDecl]
+-- data ClassDecl = [VarDecl] [Methodecl] -- We can change the order of var & method decl as it should not matter
+-- data Methodecl = [Statement]
 fileP :: GenParser Char st Statement
 fileP = do
   -- TODO: use it when heirarchy is defines
@@ -160,7 +164,7 @@ varAssignDeclP = do
   case isAssignStmt of 
    			Just x -> do
    				expr <- exprP
-   				return $ Assign (VarAcc (Name [Identifier var])) expr
+   				return $ Assign (translVar var) expr
    			Nothing -> do
   	        	var' <- varP
   	        	return $ Declare (VarDecl (transType var) (Name [Identifier var'])) Nothing
@@ -186,11 +190,12 @@ restP = do
     <|> string "<"
     <|> try (string ">=")
     <|> string ">"
-    -- <|> string "=" -- not really a binary operator, but it fits in nicely here.
     <?> "binary operator"
   e <- exprP
   return (ch, e)
 
+
+varP :: GenParser Char st String
 varP = do
   spaces
   firstChar <- letter
@@ -198,17 +203,14 @@ varP = do
   let s = firstChar:v
   return s
 
-
+-- Convert string obtained from varP to a Exp
+transrVar :: Monad m => m String -> m Exp
 transrVar s = do
 	str <- s
 	return $ Var (VarAcc (Name [Identifier str]))
 
--- translVar s = do
--- 	str <- s
--- 	return $ (VarAcc (Name [Identifier str]))
-
-
-
+translVar :: String -> VarAcc
+translVar s = VarAcc (Name [Identifier s])
 
 
 valP = do
