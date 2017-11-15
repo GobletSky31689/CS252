@@ -1,0 +1,13 @@
+var aa_65 = 10;
+var b_66 = 20;
+var c_67 = 22;
+var d_68 = 2;
+console.log("aa:" + aa_65 + " b:" + b_66 + " c:" + c_67 + " d:" + d_68);
+var tmp_69;
+tmp_69 = aa_65;
+aa_65 = d_68;
+d_68 = tmp_69;
+tmp_69 = b_66;
+b_66 = c_67;
+c_67 = tmp_69;
+console.log("aa:" + aa_65 + " b:" + b_66 + " c:" + c_67 + " d:" + d_68);
