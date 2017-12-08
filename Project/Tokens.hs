@@ -56,8 +56,10 @@ newtype ClassBody = ClassBody [Decl]
 newtype PackageDecl = PackageDecl Name
   deriving (Eq,Show,Read)
 
+
+
 data ImportDecl
-    = ImportDecl Bool {- static? -} Name Bool {- .*? -}
+    = ImportDecl Bool Name Bool
   deriving (Eq,Show,Read)
 
 data Modifier

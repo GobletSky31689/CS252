@@ -1,7 +1,8 @@
 package com.gobletsky.obfuscator;
+import java.lang.System;
+public class HelloWorld {
+public static void main (String[] args) {
 int a;
-a = 2;
-int b;
-b = 3;
-int c;
-c = a + b
+a = 2
+}
+}
