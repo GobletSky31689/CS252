@@ -69,9 +69,7 @@ methodP = do
     spaces
     char '{'
     statments <- statementP
-    spaces
---     char ';'
-    char '}'
+    -- Note that statementP will eat the closing braces!!
     spaces
     return $ MethodDecl [] ret_type (Name [Identifier name]) [] statments
 
@@ -161,15 +159,20 @@ transType s = case s of
 statementP :: GenParser Char st Statement
 statementP = do
     e <- statementP'
-    rest <- optionMaybe restSeqP
-    return (case rest of
-        Nothing -> e
-        Just e' -> Sequence e e')
-
-restSeqP :: GenParser Char st Statement
-restSeqP = do
     char ';'
-    statementP
+    spaces
+    blockFinish <- optionMaybe (char '}')
+    case blockFinish of
+        Nothing -> do
+            e' <- statementP
+            return $ Sequence e e'
+        Just _ -> return e
+
+
+-- restSeqP :: GenParser Char st Statement
+-- restSeqP = do
+--     char ';'
+--     statementP
 
 -- Parse a single statement
 statementP' :: GenParser Char st Statement
