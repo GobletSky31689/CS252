@@ -3,64 +3,65 @@ module Syntax where
 -- Syntax created from Chapter 18 of Java Specification book
 
 
--- First Bool is for static, second bool is Wildcard(*) package imports
--- TODO: Figure out how to do Package import properly-- "*" is NOT an identifier
+-- First Bool is for static, second bool is for Wildcard(*) package imports
 data ImportDecl
     = ImportDecl Bool Name Bool
-  deriving (Eq,Show,Read)
+    deriving (Eq,Show,Read)
 
 
 data CompilationUnit = CompilationUnit (Maybe PackageDecl) [ImportDecl] ClassDecl
-  deriving (Eq,Show,Read)
+    deriving (Eq,Show,Read)
 
 
 -- Only Implementing NormalClassDeclaration
 -- No support for Enums
 data ClassDecl = ClassDecl [Modifier] Name ClassBody
-  deriving (Eq,Show,Read)
+    deriving (Eq,Show,Read)
 
 
-data Modifier =
-    Public
-  | Protected
-  | Private
-  | Static
-  | Abstract
-  | Final
-  | Native
-  | Synchronized
-  | Transient
-  | Volatile
-  | Strictfp
-  deriving (Eq,Show,Read)
+data Modifier
+    = Public
+    | Protected
+    | Private
+    | Static
+    | Abstract
+    | Final
+    | Native
+    | Synchronized
+    | Transient
+    | Volatile
+    | Strictfp
+    deriving (Eq,Show,Read)
 
 
 data ClassBody = ClassBody [MethodDecl]
-  deriving (Eq,Show,Read)
+    deriving (Eq,Show,Read)
 
 
 data MethodDecl = MethodDecl [Modifier] Type Name [FormalParameterDecl] Statement
-  deriving (Eq,Show,Read)
+    deriving (Eq,Show,Read)
 
 -- Bool is for checking final or not
 data FormalParameterDecl = FormalParameterDecl Bool Type Name
-  deriving (Eq,Show,Read)
+    deriving (Eq,Show,Read)
 
 
 -- package com.gobletsky.obfuscator;
 data PackageDecl = PackageDecl Name
-  	deriving (Eq,Show,Read)
+    deriving (Eq,Show,Read)
 
-data Statement = Declare VarDecl (Maybe Exp)
+data Statement
+    = Declare VarDecl (Maybe Exp)
     | Assign VarAcc Exp
     | Sequence Statement Statement
     deriving (Eq,Show,Read)
 
 -- Only supporting few expressions for now.
-data Exp = Lit Literal
-	    	| Var VarAcc
-	    	| Op BinOp Exp Exp
-	    	deriving (Eq,Show,Read)
+data Exp
+    = Lit Literal
+    | Var VarAcc
+    | Op BinOp Exp Exp
+    deriving (Eq,Show,Read)
 
 -- An variable declaration
 data VarDecl = VarDecl Type Name
@@ -85,7 +86,7 @@ data Name = Name [Identifier]
 data Type
     = PrimType Primitives
     | ClassRefType Identifier
-  deriving (Eq,Show,Read)
+    deriving (Eq,Show,Read)
 
 
 data Primitives
@@ -98,25 +99,27 @@ data Primitives
     | FloatType
     | DoubleType
     | VoidType
-  deriving (Eq,Show,Read)
+    deriving (Eq,Show,Read)
 
 
 -- This is different from Primitive types above. Primitive define "type" of variable.
 -- Literal are "fixed" values, that would be assigned to these variables.
 -- TODO: Add String literal support
-data Literal = Int Integer
-		    | Boolean Bool
-		    | Real Double
-  			deriving (Eq,Show,Read)
+data Literal
+    = Int Integer
+    | Boolean Bool
+    | Real Double
+    deriving (Eq,Show,Read)
 
 
 -- same as HW3
-data BinOp = Plus
-  | Minus
-  | Times
-  | Divide
-  | Gt
-  | Ge
-  | Lt
-  | Le
-  deriving (Eq,Show,Read)
+data BinOp
+    = Plus
+    | Minus
+    | Times
+    | Divide
+    | Gt
+    | Ge
+    | Lt
+    | Le
+    deriving (Eq,Show,Read)
