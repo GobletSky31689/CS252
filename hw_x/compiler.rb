@@ -1,5 +1,7 @@
 NUM_PAT = /[1-9]\d*|0/
 BOOL_PAT = /#[tf]/
+IF_PAT = /if /
+COMMENT_PAT = /;/
 
 # Available opcodes for our VM
 PRINT_OP = "PRINT"
@@ -7,11 +9,13 @@ PUSH_OP = "PUSH"
 ADD_OP = "ADD"
 SUB_OP = "SUB"
 MUL_OP = "MUL"
-# JMP_OP = "JMP"
-# JZ_OP = "JZ"
-# JNZ_OP = "JNZ"
+JMP_OP = "JMP"
+JZ_OP = "JZ"
+JNZ_OP = "JNZ"
+
 
 class AST
+  @@label_counter = 0
   attr_accessor :op, :parent, :args
   def initialize(op, parent)
     @op = op
@@ -69,6 +73,16 @@ class AST
     when 'println'
       comp_arg(@args[0], bytecode)
       bytecode.push(PRINT_OP)
+    when 'if'
+      comp_arg(@args[0], bytecode)
+      bytecode.push("#{JZ_OP} fls#{@@label_counter}")
+      bytecode.push("tru#{@@label_counter}:")
+      comp_arg(@args[1], bytecode)
+      bytecode.push("#{JMP_OP} done#{@@label_counter}")
+      bytecode.push("fls#{@@label_counter}:")
+      comp_arg(@args[2], bytecode)
+      bytecode.push("done#{@@label_counter}:")
+      @@label_counter += 1
     when '+'
       comp_arg(@args[0], bytecode)
       comp_arg(@args[1], bytecode)
@@ -148,6 +162,8 @@ class Parser
           ast.parent.add_arg(ast)
           ast = ast.parent
         end
+      when COMMENT_PAT
+        break
       when BOOL_PAT
         if ast then
           if tokens[i][1] == 't'
