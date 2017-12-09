@@ -21,7 +21,7 @@ LOAD_OP = "LOAD"
 
 class AST
   @@mapping = {}
-  @@map_counter = 0
+  @@map_counter = -1
   @@label_counter = 0
   attr_accessor :op, :parent, :args
   def initialize(op, parent)
@@ -82,17 +82,20 @@ class AST
       bytecode.push(PRINT_OP)
     when 'let'
       comp_arg(@args[1], bytecode)
-      @@mapping.store(@args[0], @@map_counter)
-      bytecode.push("#{STOR_OP} #{@@map_counter}")
-      @@map_counter += 1
+      if not @@mapping.key?(@args[0])
+        @@map_counter += 1
+        @@mapping.store(@args[0], @@map_counter)
+      end
+      bytecode.push("#{STOR_OP} #{@@mapping.fetch(@args[0])}")
       if @args.length > 2
         i = 2
         while not @args[i].is_a?(AST)
-          puts @args[i]
           comp_arg(@args[i+1], bytecode)
-          @@mapping.store(@args[i+0], @@map_counter)
-          bytecode.push("#{STOR_OP} #{@@map_counter}")
-          @@map_counter += 1
+          if not @@mapping.key?(@args[i])
+            @@map_counter += 1
+            @@mapping.store(@args[i], @@map_counter)
+          end
+          bytecode.push("#{STOR_OP} #{@@mapping.fetch(@args[i])}")
           i += 2
         end
         @args[i..@args.length].each do |arg|
