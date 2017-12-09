@@ -1,0 +1,14 @@
+PUSH 0
+JZ fls0
+tru0:
+PUSH 1
+PRINT
+JMP done0
+fls0:
+PUSH 2
+PRINT
+done0:
+PUSH 3
+PRINT
+PUSH 1
+PRINT
