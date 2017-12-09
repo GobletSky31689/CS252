@@ -32,16 +32,16 @@ data Modifier =
   deriving (Eq,Show,Read)
 
 
-data ClassBody = ClassBody Statement
+data ClassBody = ClassBody [MethodDecl]
   deriving (Eq,Show,Read)
 
 
--- data Methodecl = Methodecl Type Name [FormalParameterDecls] (Maybe Statement)
---   deriving (Eq,Show,Read)
+data MethodDecl = MethodDecl [Modifier] Type Name [FormalParameterDecls] Statement
+  deriving (Eq,Show,Read)
 
--- -- Bool is for checking final or not
--- data FormalParameterDecls = FormalParameterDecls Bool Type Name
---   deriving (Eq,Show,Read)
+-- Bool is for checking final or not
+data FormalParameterDecls = FormalParameterDecls Bool Type Name
+  deriving (Eq,Show,Read)
 
 
 -- package com.gobletsky.obfuscator;
@@ -94,6 +94,7 @@ data Primitives
     | CharType
     | FloatType
     | DoubleType
+    | VoidType
   deriving (Eq,Show,Read)
 
 

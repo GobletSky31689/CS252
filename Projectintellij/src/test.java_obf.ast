@@ -1,0 +1,1 @@
+CompilationUnit Nothing [ImportDecl True (Name [Identifier "java",Identifier "lang",Identifier "System"]) True] (ClassDecl [] (Name [Identifier "test"]) (ClassBody [MethodDecl [] (PrimType VoidType) (Name [Identifier "main"]) [] (Sequence (Declare (VarDecl (PrimType IntType) (Name [Identifier "a"])) Nothing) (Assign (VarAcc (Name [Identifier "a"])) (Lit (Int 2))))]))

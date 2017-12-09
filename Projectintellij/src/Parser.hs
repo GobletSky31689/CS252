@@ -9,18 +9,27 @@ singleString = do
     return x
 
 
+types :: GenParser Char st Type
+types = do
+    ch <- string "void"
+        <|> string "int"
+        <?> "types"
+    return $ transType ch
+
 modifier :: GenParser Char st Modifier
 modifier = do
-    ch <- string "public"
+    ch <- string "static"
+        <|> string "public"
         <|> string "private"
         <?> "modifier"
+    spaces
     return $ transModifier ch
 
 
 
 classDeclP :: GenParser Char st ClassDecl
 classDeclP = do
-    x <- many modifier
+    x <- many1 modifier
     spaces
     string "class"
     spaces
@@ -37,15 +46,34 @@ classDeclP = do
 
 classBodyP :: GenParser Char st ClassBody
 classBodyP = do
-    string "public static void main (String[] args) {"
     spaces
+    methods <- many methodP
+    spaces
+    return $ ClassBody methods
+
+
+
+methodP :: GenParser Char st MethodDecl
+methodP = do
+    x <- many modifier
+    spaces
+    ret_type <- types
+    spaces
+    name <- singleString
+    spaces
+    char '('
+    spaces
+    string "String[] args"
+    spaces
+    char ')'
+    spaces
+    char '{'
     statments <- statementP
     spaces
+--     char ';'
     char '}'
     spaces
-    return $ ClassBody statments
-
-
+    return $ MethodDecl [] ret_type (Name [Identifier name]) [] statments
 
 
 
@@ -78,11 +106,11 @@ packageNameP = do
 -- TODO: Create a ADT that simulates the heirarchy of a typical
 -- Java Program like PackageDecl -> ImportStmts -> ClassDecls
 -- ClassDecls can further have FieldDecls and MethodDecls
--- MethoodDecls can further have sequence of Exp
--- E.g. somethin like this:
+-- MethodDecls can further have sequence of Exp
+-- E.g. something like this:
 -- data JavaPrg = (Maybe PackageDecl) [ImportStmt] [ClassDecl]
--- data ClassDecl = [VarDecl] [Methodecl] -- We can change the order of var & method decl as it should not matter
--- data Methodecl = [Statement]
+-- data ClassDecl = [VarDecl] [MethodDecl] -- We can change the order of var & method decl as it should not matter
+-- data MethodDecl = [Statement]
 fileP :: GenParser Char st CompilationUnit
 fileP = do
   -- TODO: use it when heirarchy is defines
@@ -110,11 +138,13 @@ transOp s = case s of
 transModifier s = case s of
     "public"  -> Public
     "private"  -> Private
+    "static"  -> Static
 
 
 
 -- Utility function to transform string to Type
 transType s = case s of
+    "void"  -> PrimType VoidType
     "bool"  -> PrimType BooleanType
     "byte"  -> PrimType ByteType
     "short"  -> PrimType ShortType
