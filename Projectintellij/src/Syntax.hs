@@ -3,10 +3,10 @@ module Syntax where
 -- Syntax created from Chapter 18 of Java Specification book
 
 
--- First Bool is for static
+-- First Bool is for static, second bool is Wildcard(*) package imports
 -- TODO: Figure out how to do Package import properly-- "*" is NOT an identifier
 data ImportDecl
-    = ImportDecl Bool Name -- Bool
+    = ImportDecl Bool Name Bool
   deriving (Eq,Show,Read)
 
 

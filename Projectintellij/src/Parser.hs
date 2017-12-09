@@ -101,13 +101,15 @@ importP = do
     spaces
     static <- optionMaybe $ string "static"
     spaces
-    package <- (many (noneOf (". \n;"))) `sepBy` (char '.')
---     spaces
---     isPackageImport <- optionMaybe $ string ".*"
+    package <- (many (noneOf (". \n;*"))) `sepBy` (char '.')
+    spaces
+    wildCardImport <- optionMaybe $ string "*"
     spaces
     char ';'
     spaces
-    return $ ImportDecl (isJust static) (Name [Identifier x1 | x1 <- package])-- True
+    if (isJust wildCardImport)
+        then return $ ImportDecl (isJust static) (Name [Identifier x1 | x1 <- (init package)]) True
+        else return $ ImportDecl (isJust static) (Name [Identifier x1 | x1 <- package]) False
 
 
 packageNameP :: GenParser Char st PackageDecl
