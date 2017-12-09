@@ -16,9 +16,6 @@ JNZ_OP = "JNZ"
 STOR_OP = "STOR"
 LOAD_OP = "LOAD"
 
-
-
-
 class AST
   @@mapping = {}
   @@map_counter = -1

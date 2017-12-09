@@ -5,6 +5,13 @@ PRINT_OP = /PRINT/ # pops the top number off of the stack and prints it
 ADD_OP = /ADD/ # pops the top two elements off the stack, adds them, and puts the result back on to the stack
 SUB_OP = /SUB/ # pops the top two elements off the stack, subtracts them, and ...
 MUL_OP = /MUL/ # pops the top two elements off the stack, multiplies them, and ...
+JMP_OP = /JMP/
+JZ_OP = /JZ/
+JNZ_OP = /JNZ/
+STOR_OP = /STOR/
+LOAD_OP = /LOAD/
+
+LABEL_PAT = /[a-zA-Z0-9_]+:/
 
 class VirtualMachine
   def initialize
@@ -12,7 +19,10 @@ class VirtualMachine
   end
   def exec(bytecode_file)
     File.open(bytecode_file, 'r') do |file|
-      file.each_line do |ln|
+      lines = file.readlines
+      i = 0
+      while (i < lines.size)
+        ln = lines[i].strip
         case ln
         when PUSH_OP
           @stack.push(ln.sub(PUSH_OP, '\1').to_i)
@@ -23,6 +33,29 @@ class VirtualMachine
           v1 = @stack.pop
           v2 = @stack.pop
           @stack.push(v2 + v1)
+        when JZ_OP
+          v1 = @stack.pop
+          jmp_to = ln.sub(JZ_OP, '\1').strip
+          if v1 == 0
+            i += 1
+            ln = lines[i].strip
+            while not ln == (jmp_to ++ ':') # and i < lines.size
+              i += 1
+              ln = lines[i].strip
+            end
+            # puts "Skipped to line:"
+            # puts ln
+          end
+        when JMP_OP
+          jmp_to = ln.sub(JMP_OP, '\1').strip
+          i += 1
+          ln = lines[i].strip
+          while not v2 == (jmp_to ++ ':') # and i < lines.size
+            i += 1
+            ln = lines[i].strip
+          end
+          # puts "Skipped to line:"
+          # puts ln
         when SUB_OP
           v1 = @stack.pop
           v2 = @stack.pop
@@ -32,8 +65,11 @@ class VirtualMachine
           v2 = @stack.pop
           @stack.push(v2 * v1)
         else
-          raise "Unrecognized command: '#{ln}'"
+          if not (ln =~ LABEL_PAT) == 0
+            raise "Unrecognized command: '#{ln}'"
+          end
         end
+        i += 1
       end
     end
   end
