@@ -5,11 +5,11 @@ PRINT_OP = /PRINT/ # pops the top number off of the stack and prints it
 ADD_OP = /ADD/ # pops the top two elements off the stack, adds them, and puts the result back on to the stack
 SUB_OP = /SUB/ # pops the top two elements off the stack, subtracts them, and ...
 MUL_OP = /MUL/ # pops the top two elements off the stack, multiplies them, and ...
-JMP_OP = /JMP/
-JZ_OP = /JZ/
-JNZ_OP = /JNZ/
-STOR_OP = /STOR/
-LOAD_OP = /LOAD/
+JMP_OP = /JMP/ # unconditional jump to the specified label
+JZ_OP = /JZ/ # pop the top value on the stack.  If it is zero, jump to the specified label.
+JNZ_OP = /JNZ/ # pop the top value on the stack.  If it is **not** zero, jump to the specified label.
+STOR_OP = /STOR/ # pop the top value on the stack, and store it in the given register.
+LOAD_OP = /LOAD/ # get the value from the given register and push it on to the stack.
 
 LABEL_PAT = /[a-zA-Z0-9_]+:/
 
