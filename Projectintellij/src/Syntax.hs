@@ -1,9 +1,12 @@
 module Syntax where
 
+-- Syntax created from Chapter 18 of Java Specification book
+
+
 -- First Bool is for static
--- Second Bool is for .*
+-- TODO: Figure out how to do Package import properly-- "*" is NOT an identifier
 data ImportDecl
-    = ImportDecl Bool Name Bool
+    = ImportDecl Bool Name -- Bool
   deriving (Eq,Show,Read)
 
 
@@ -36,11 +39,11 @@ data ClassBody = ClassBody [MethodDecl]
   deriving (Eq,Show,Read)
 
 
-data MethodDecl = MethodDecl [Modifier] Type Name [FormalParameterDecls] Statement
+data MethodDecl = MethodDecl [Modifier] Type Name [FormalParameterDecl] Statement
   deriving (Eq,Show,Read)
 
 -- Bool is for checking final or not
-data FormalParameterDecls = FormalParameterDecls Bool Type Name
+data FormalParameterDecl = FormalParameterDecl Bool Type Name
   deriving (Eq,Show,Read)
 
 

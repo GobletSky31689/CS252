@@ -1,6 +1,8 @@
 import Text.ParserCombinators.Parsec
 import System.Environment
 import Syntax
+import Data.Maybe (isJust)
+
 
 
 singleString :: GenParser Char st String
@@ -11,9 +13,7 @@ singleString = do
 
 types :: GenParser Char st Type
 types = do
-    ch <- string "void"
-        <|> string "int"
-        <?> "types"
+    ch <- singleString
     return $ transType ch
 
 modifier :: GenParser Char st Modifier
@@ -40,7 +40,7 @@ classDeclP = do
     body <- classBodyP
     spaces
     char '}'
-    return $ ClassDecl [] (Name [Identifier name]) body
+    return $ ClassDecl x (Name [Identifier name]) body
 
 
 
@@ -53,8 +53,22 @@ classBodyP = do
 
 
 
+formalParamP :: GenParser Char st FormalParameterDecl
+formalParamP = do
+    spaces
+    final <- optionMaybe $ string "final"
+    spaces
+    arg_type <- types
+    spaces
+    name <- singleString
+    spaces
+    return $ FormalParameterDecl (isJust final) arg_type (Name [Identifier name])
+
+
+
 methodP :: GenParser Char st MethodDecl
 methodP = do
+    spaces
     x <- many modifier
     spaces
     ret_type <- types
@@ -63,7 +77,7 @@ methodP = do
     spaces
     char '('
     spaces
-    string "String[] args"
+    params <- formalParamP `sepBy` (char ',')
     spaces
     char ')'
     spaces
@@ -71,23 +85,29 @@ methodP = do
     statments <- statementP
     -- Note that statementP will eat the closing braces!!
     spaces
-    return $ MethodDecl [] ret_type (Name [Identifier name]) [] statments
+    return $ MethodDecl x ret_type (Name [Identifier name]) params statments
 
+
+
+-- singleString :: GenParser Char st String
+-- singleString = do
+--     x <- many1 letter
+--     return x
 
 
 importP :: GenParser Char st ImportDecl
 importP = do
     string "import"
     spaces
-    isStatic <- optionMaybe $ string "static"
+    static <- optionMaybe $ string "static"
     spaces
-    package <- singleString `sepBy` (char '.')
-  -- spaces
-  -- isUniversal <- optionMaybe $ string ".*"
+    package <- (many (noneOf (". \n;"))) `sepBy` (char '.')
+--     spaces
+--     isPackageImport <- optionMaybe $ string ".*"
     spaces
     char ';'
     spaces
-    return $ ImportDecl True (Name [Identifier x1 | x1 <- package]) True
+    return $ ImportDecl (isJust static) (Name [Identifier x1 | x1 <- package])-- True
 
 
 packageNameP :: GenParser Char st PackageDecl

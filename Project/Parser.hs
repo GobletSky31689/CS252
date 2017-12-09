@@ -63,8 +63,7 @@ importP = do
   isStatic <- optionMaybe $ string "static"
   spaces
   package <- singleString `sepBy` (char '.')
-  -- spaces
-  -- isUniversal <- optionMaybe $ string ".*"
+
   spaces
   char ';'
   spaces
