@@ -51,7 +51,7 @@ class VirtualMachine
           jmp_to = ln.sub(JMP_OP, '\1').strip
           i += 1
           ln = lines[i].strip
-          while not v2 == (jmp_to ++ ':') # and i < lines.size
+          while not ln == (jmp_to ++ ':') # and i < lines.size
             i += 1
             ln = lines[i].strip
           end
@@ -74,7 +74,7 @@ class VirtualMachine
           v2 = @stack.pop
           @stack.push(v2 * v1)
         else
-          if not (ln =~ LABEL_PAT) == 0
+          if ln.size > 0 and not (ln =~ LABEL_PAT) == 0
             raise "Unrecognized command: '#{ln}'"
           end
         end
