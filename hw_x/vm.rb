@@ -15,6 +15,7 @@ LABEL_PAT = /[a-zA-Z0-9_]+:/
 
 class VirtualMachine
   def initialize
+    @registers = {}
     @stack = []
   end
   def exec(bytecode_file)
@@ -56,6 +57,14 @@ class VirtualMachine
           end
           # puts "Skipped to line:"
           # puts ln
+        when STOR_OP
+          v1 = @stack.pop
+          reg_name = ln.sub(STOR_OP, '\1').strip
+          @registers.store(reg_name, v1)
+        when LOAD_OP
+          reg_name = ln.sub(LOAD_OP, '\1').strip
+          v1 = @registers.fetch(reg_name)
+          @stack.push(v1.to_i)
         when SUB_OP
           v1 = @stack.pop
           v2 = @stack.pop
