@@ -2,6 +2,7 @@ NUM_PAT = /[1-9]\d*|0/
 BOOL_PAT = /#[tf]/
 IF_PAT = /if /
 COMMENT_PAT = /;/
+ASSIGN_PAT = /\[/
 
 # Available opcodes for our VM
 PRINT_OP = "PRINT"
@@ -12,9 +13,15 @@ MUL_OP = "MUL"
 JMP_OP = "JMP"
 JZ_OP = "JZ"
 JNZ_OP = "JNZ"
+STOR_OP = "STOR"
+LOAD_OP = "LOAD"
+
+
 
 
 class AST
+  @@mapping = {}
+  @@map_counter = 0
   @@label_counter = 0
   attr_accessor :op, :parent, :args
   def initialize(op, parent)
@@ -73,6 +80,25 @@ class AST
     when 'println'
       comp_arg(@args[0], bytecode)
       bytecode.push(PRINT_OP)
+    when 'let'
+      comp_arg(@args[1], bytecode)
+      @@mapping.store(@args[0], @@map_counter)
+      bytecode.push("#{STOR_OP} #{@@map_counter}")
+      @@map_counter += 1
+      if @args.length > 2
+        i = 2
+        while not @args[i].is_a?(AST)
+          puts @args[i]
+          comp_arg(@args[i+1], bytecode)
+          @@mapping.store(@args[i+0], @@map_counter)
+          bytecode.push("#{STOR_OP} #{@@map_counter}")
+          @@map_counter += 1
+          i += 2
+        end
+        @args[i..@args.length].each do |arg|
+          comp_arg(arg, bytecode)
+        end
+      end
     when 'if'
       comp_arg(@args[0], bytecode)
       bytecode.push("#{JZ_OP} fls#{@@label_counter}")
@@ -122,6 +148,8 @@ class AST
   def comp_arg(v, bytecode)
     if v.is_a?(Integer) then
       bytecode.push("#{PUSH_OP} #{v}")
+    elsif @@mapping.key? v
+      bytecode.push("#{LOAD_OP} #{@@mapping.fetch(v)}")
     else
       bytecode.concat(v.to_bytecode)
     end
@@ -130,6 +158,7 @@ end
 
 # Responsible for parsing the source code, either for the interpreter or the compiler
 class Parser
+  @@vars_seen = []
   def parse(file)
     asts = []
     File.open(file, "r") do |file|
@@ -145,6 +174,9 @@ class Parser
     # Adding spaces around parens to make tokenization trivial.
     line = line.gsub(/\(/, ' ( ')
     line = line.gsub(/\)/, ' ) ')
+    # Removing spaces around square to make pattern match.
+    line = line.gsub(/\[\ */, ' [')
+    line = line.gsub(/\ *\]/, '] ')
     line.split
   end
   # [token] -> [AST]
@@ -155,15 +187,28 @@ class Parser
     while (i <= tokens.length)
       case tokens[i]
       when '('
-        ast = AST.new(tokens[i+1], ast) # Assuming that we will only receive valid programs
-        i += 1 # Skipping an extra token
+        if (tokens[i+1] =~ ASSIGN_PAT) == 0
+          @@vars_seen.push(tokens[i+1][1])
+          ast.add_arg(tokens[i+1][1])
+          ast.add_arg(tokens[i+2][0].to_i)
+          i += 2
+          while (tokens[i+1] =~ ASSIGN_PAT) == 0
+            @@vars_seen.push(tokens[i+1][1])
+            ast.add_arg(tokens[i+1][1])
+            ast.add_arg(tokens[i+2][0].to_i)
+            i += 2
+          end
+        else
+          ast = AST.new(tokens[i+1], ast) # Assuming that we will only receive valid programs
+          i += 1 # Skipping an extra token
+        end
       when ')'
         if ast.parent then
           ast.parent.add_arg(ast)
           ast = ast.parent
         end
       when COMMENT_PAT
-        break
+        break # Go to next line
       when BOOL_PAT
         if ast then
           if tokens[i][1] == 't'
@@ -179,7 +224,12 @@ class Parser
           raise "Top-level numbers are not permitted"
         end
       when /.+/ # If anything else matches (and is at least one char), raise an error
-        raise "Unrecognized token: '#{tokens[i]}'"
+        if ast and @@vars_seen.include? tokens[i]
+          ast.add_arg(tokens[i])
+        else
+          puts tokens
+          raise "Unrecognized token: '#{tokens[i]}'"
+        end
       end
       i += 1
     end
