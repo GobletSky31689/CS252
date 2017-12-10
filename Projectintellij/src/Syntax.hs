@@ -54,6 +54,7 @@ data Statement
     = Declare VarDecl (Maybe Exp)
     | Assign VarAcc Exp
     | Sequence Statement Statement
+    | Return Exp
     deriving (Eq,Show,Read)
 
 -- Only supporting few expressions for now.

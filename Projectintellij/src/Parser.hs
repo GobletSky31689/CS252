@@ -211,9 +211,19 @@ statementP' = do
     spaces
     -- Only Variable Declaration & Assignment statements supported for now
     -- TODO: Changing the order of assign & Decl causes errors. Can it be fixed??
-    stmnt <- varAssignDeclP
+    stmnt <- varAssignDeclP <|> returnP
     spaces
     return stmnt
+
+
+
+returnP :: GenParser Char st Statement
+returnP = do
+    string "return"
+    spaces
+    expr <- exprP
+    spaces
+    return $ Return expr
 
 
 varAssignDeclP :: GenParser Char st Statement
