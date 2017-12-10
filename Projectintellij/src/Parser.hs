@@ -1,8 +1,9 @@
+module Parser where
+
 import Text.ParserCombinators.Parsec
 import System.Environment
 import Syntax
 import Data.Maybe (isJust)
-
 
 
 singleString :: GenParser Char st String
@@ -287,6 +288,11 @@ numberP = do
             return $ Real (read (n ++ "." ++ f))
 
 
+getParsedExp fileName = do
+    p <- parseFromFile fileP fileName
+    return p
+
+
 showParsedExp fileName = do
     p <- parseFromFile fileP fileName
     case p of
@@ -294,10 +300,10 @@ showParsedExp fileName = do
         Right exp -> print exp
 
 
-main = do
-    args <- getArgs
-    p <- parseFromFile fileP $ head args
-    case p of
-        Left parseErr -> print parseErr
-        Right ast -> writeFile ((head args) ++ "_obf.ast") (show ast)
+-- main = do
+--     args <- getArgs
+--     p <- parseFromFile fileP $ head args
+--     case p of
+--         Left parseErr -> print parseErr
+--         Right ast -> writeFile ((head args) ++ "_obf.ast") (show ast)
 
