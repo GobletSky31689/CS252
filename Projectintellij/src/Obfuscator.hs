@@ -26,8 +26,9 @@ getMethod (MethodDecl modifiers ret_type name params statements) mapping =
                                     (getModifiers modifiers)
                                     ++ (getType ret_type)
                                     ++ (getName name)
-                                    ++ "(" ++ (getParams params) ++ ")"
-                                    ++ "{\n" ++ (getStatement statements mapping) ++ "\n}"
+                                    ++ "(" ++ formal_params ++ ")"
+                                    ++ "{\n" ++ (getStatement statements mapping') ++ "\n}"
+                                    where (formal_params, mapping') = (getParams params mapping)
 
 
 getLiteral literal = case literal of
@@ -47,16 +48,19 @@ getBinOp x = case x of
     Le -> "<="
 
 
-getObfName name mapping = case (Map.lookup name mapping) of
+getObfName name mapping = case (Map.lookup orig_name mapping) of
                                  Just s' -> s'
-                                 Nothing -> name
+                                 Nothing -> orig_name
+                          where orig_name = getName name
 
-storeObfName name mapping = Map.insert name ("_o_" ++ name) mapping
+
+storeObfName name mapping = Map.insert orig_name ("_o_" ++ orig_name ++ "_o_") mapping
+                          where orig_name = getName name
 
 
 getExpr exp mapping = case exp of
     Lit literal -> getLiteral literal
-    Var (VarAcc name) -> getObfName (getName name) mapping
+    Var (VarAcc name) -> getObfName name mapping
     Op binOp exp1 exp2 -> (getExpr exp1 mapping) ++ (getBinOp binOp) ++ (getExpr exp2 mapping)
 
 
@@ -67,25 +71,32 @@ getAltStatement statement mapping = case statement of
                           (secondStatement, mapping'') = (getAltStatement st2 mapping')
 
     Declare (VarDecl _type name) exp -> (((getType _type)
-                                   ++ (getObfName (getName name) mapping')
+                                   ++ (getObfName name mapping')
                                    ++ (case exp of
                                          Just exp' -> "=" ++ (getExpr exp' mapping')
                                          Nothing -> "")
                                    ++ ";"), mapping')
-                                   where mapping' = storeObfName (getName name) mapping
+                                   where mapping' = storeObfName name mapping
 
-    Assign (VarAcc name) exp -> (((getObfName (getName name) mapping) ++ "=" ++ (getExpr exp mapping) ++ ";"), mapping)
+    Assign (VarAcc name) exp -> (((getObfName name mapping) ++ "=" ++ (getExpr exp mapping) ++ ";"), mapping)
 
 
 getStatement statement mapping = statementStrs
     where (statementStrs, mapping') = getAltStatement statement mapping
 
 
-getParams params = intercalate ", " [getParam param | param <- params]
+getParams params mapping = (intercalate ", " [newParam | newParam <- newParamList], new_mapping)
+    where (newParamList, new_mapping) = foldl storeParams ([], mapping) params
 
-getParam (FormalParameterDecl isFinal _type name) = (if isFinal then "final " else "")
+
+storeParams (acc_args, acc_mapping) param = ((param' : acc_args), new_acc_mapping)
+    where (param', new_acc_mapping) = getParam param acc_mapping
+
+
+getParam (FormalParameterDecl isFinal _type name) mapping = ((if isFinal then "final " else "")
                                     ++ (getType _type)
-                                    ++ (getName name)
+                                    ++ (getObfName name mapping'), mapping')
+                                    where mapping' = storeObfName name mapping
 
 
 getType _type = case _type of

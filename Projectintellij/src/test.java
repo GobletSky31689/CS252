@@ -1,8 +1,15 @@
 package com.gobletsky.test;
 import java.lang.System.*;
-public class test {
-public static void main (String []args) {
-int a = 2;
-a = 2;
+public class Math{
+
+public int add(int x, int y) {
+    int c = x + y;
 }
+
+
+public int subtract(int x, int y) {
+        int c = x - y;
+}
+
+
 }
