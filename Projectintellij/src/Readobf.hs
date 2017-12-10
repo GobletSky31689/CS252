@@ -1,0 +1,41 @@
+-- {-# LANGUAGE FlexibleContexts #-}
+--
+-- module Readobf where
+-- --https://stackoverflow.com/questions/17500194/generate-a-random-string-at-compile-time-or-run-time-and-use-it-in-the-rest-of-t/17500822#17500822
+--
+-- import Control.Applicative
+-- import Control.Monad.Reader
+-- import System.Random
+-- import qualified Data.Map           as Map
+--
+-- f :: MonadReader String m => Int -> Int -> m Int
+-- f x y = do
+--    rstr <- ask
+--    return $ length rstr * x * y
+--
+-- g :: Int -> Int
+-- g x = x*x
+--
+-- h :: MonadReader String m => String -> m Int
+-- h str = do
+--    rstr <- ask
+--    return . sum . map fromEnum $ zipWith min rstr str
+--
+-- main :: IO ()
+-- main = do
+--    rstr <- randomString
+--    putStr "The result is: "
+--    print rstr
+--    print $ runReader (f (g 17) =<< h "other string") rstr
+--    print $ runReader (f (g 17) =<< h "other string") rstr
+--
+--
+--
+-- -- storeObfName :: String -> Map.Map [Char] [Char] -> Map.Map [Char] [Char]
+-- -- storeObfName name mapping = Map.insert name obf_name mapping
+-- --                           where obf_name = do
+-- --                                              rstr <- randomString
+-- --                                              return $ runReader (f (g 17) =<< h "other string") rstr
+--
+-- randomString :: IO String
+-- randomString = flip replicateM (randomRIO (' ','~')) =<< randomRIO (1,32)

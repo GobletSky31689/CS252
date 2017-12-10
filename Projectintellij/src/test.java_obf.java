@@ -1,10 +1,10 @@
 package com.gobletsky.test;
 import java.lang.System.*;
 public class Math{
-public int add(int _o_y_o_, int _o_x_o_){
-int _o_c_o_=_o_x_o_+_o_y_o_;
+public int add(int glntlwztrt, int ufhqpjbvzu){
+int oppuvhdnap=ufhqpjbvzu+glntlwztrt;
 }
-public int subtract(int _o_y_o_, int _o_x_o_){
-int _o_c_o_=_o_x_o_-_o_y_o_;
+public int subtract(int nzggbkbogt, int vyqqgrzxxx){
+int wlxgwbewnw=vyqqgrzxxx-nzggbkbogt;
 }
 }

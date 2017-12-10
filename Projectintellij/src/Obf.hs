@@ -1,0 +1,28 @@
+-- module Obf where
+-- import System.Random (getStdGen, randomR, StdGen)
+-- -- https://stackoverflow.com/questions/23998848/haskell-selective-text-obfuscation
+--
+-- obfuscate :: StdGen -> String -> String
+-- obfuscate g = obfuscate' g []
+--   where
+--     obfuscate' _ a [] = reverse a
+--     obfuscate' g a text@(c:cs)
+--       | isAlpha  c = obf obfuscateAlpha g a text
+--       | isNumber c = obf obfuscateDigit g a text
+--       | otherwise  = obf id             g a text
+--     obf f g a (c:cs) = let (x,g') = f (c,g) in obfuscate' g' (x:a) cs
+--
+--
+-- obfuscateAlpha, obfuscateDigit :: (Char, StdGen) -> (Char, StdGen)
+-- obfuscateAlpha (c,g) = obfuscateChar g range
+--   where range
+--           | isUpper c = ('A','Z')
+--           | otherwise = ('a','z')
+--
+--
+-- obfuscateDigit (c,g) = obfuscateChar g ('0','9')
+--
+--
+-- obfuscateChar :: StdGen -> (Char, Char) -> (Char, StdGen)
+-- obfuscateChar = flip randomR
+--
