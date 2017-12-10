@@ -228,7 +228,15 @@ varAssignDeclP = do
             return $ Assign (translVar var) expr
         Nothing -> do
             var' <- varP
-            return $ Declare (VarDecl (transType var) (Name [Identifier var'])) Nothing
+            spaces
+            isAssignStmtAlso <- optionMaybe (char '=')
+            spaces
+            case isAssignStmtAlso of
+                Just y -> do
+                    expr <- optionMaybe exprP
+                    return $ Declare (VarDecl (transType var) (Name [Identifier var'])) expr
+                Nothing -> return $ Declare (VarDecl (transType var) (Name [Identifier var'])) Nothing
+
 
 
 exprP :: GenParser Char st Exp
