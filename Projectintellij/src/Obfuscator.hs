@@ -78,6 +78,8 @@ main = do
     p <- getParsedExp $ head args
     case p of
         Left parseErr -> print parseErr
-        Right ast     -> writeToFile ((head args) ++ "_obf.java") ast
+        Right ast     -> do
+            writeFile ((head args) ++ "_obf.ast") (show ast)
+            writeToFile ((head args) ++ "_obf.java") ast
 
 

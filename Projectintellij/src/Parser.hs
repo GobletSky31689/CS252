@@ -4,17 +4,28 @@ import Text.ParserCombinators.Parsec
 import System.Environment
 import Syntax
 import Data.Maybe (isJust)
+import Data.String.Utils (startswith, endswith)
 
 
 singleString :: GenParser Char st String
 singleString = do
-    x <- many1 letter
+    x <- many1 (oneOf "[]" <|> letter)
     return x
+
+
+-- singleStringForType :: GenParser Char st String
+-- singleStringForType = do
+--     x <- many1 (oneOf "[]" <|> letter)
+--     return x
 
 
 types :: GenParser Char st Type
 types = do
     ch <- singleString
+--     if (endswith "[]" ch)
+--     then
+--         return $ (ArrayType (transType ch))
+--     else
     return $ transType ch
 
 modifier :: GenParser Char st Modifier
@@ -83,17 +94,14 @@ methodP = do
     char ')'
     spaces
     char '{'
-    statments <- statementP
+    statements <- statementP
     -- Note that statementP will eat the closing braces!!
     spaces
-    return $ MethodDecl x ret_type (Name [Identifier name]) params statments
-
-
-
--- singleString :: GenParser Char st String
--- singleString = do
---     x <- many1 letter
---     return x
+--     if ((startswith "[]" name) || (endswith "[]" name))
+--     then
+--         return $ MethodDecl x (ArrayType ret_type) (Name [Identifier name]) params statements
+--     else
+    return $ MethodDecl x ret_type (Name [Identifier name]) params statements
 
 
 importP :: GenParser Char st ImportDecl
@@ -299,11 +307,4 @@ showParsedExp fileName = do
         Left parseErr -> print parseErr
         Right exp -> print exp
 
-
--- main = do
---     args <- getArgs
---     p <- parseFromFile fileP $ head args
---     case p of
---         Left parseErr -> print parseErr
---         Right ast -> writeFile ((head args) ++ "_obf.ast") (show ast)
 
