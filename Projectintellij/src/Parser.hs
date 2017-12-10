@@ -211,7 +211,7 @@ statementP' = do
     spaces
     -- Only Variable Declaration & Assignment statements supported for now
     -- TODO: Changing the order of assign & Decl causes errors. Can it be fixed??
-    stmnt <- varAssignDeclP <|> returnP
+    stmnt <- returnP <|> varAssignDeclP
     spaces
     return stmnt
 

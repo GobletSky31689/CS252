@@ -91,6 +91,7 @@ getAltStatement statement mapping = case statement of
                                    where mapping' = storeObfName name mapping
 
     Assign (VarAcc name) exp -> (((getObfName name mapping) ++ "=" ++ (getExpr exp mapping) ++ ";"), mapping)
+    Return exp -> ("return " ++ (getExpr exp mapping) ++ ";", mapping)
 
 
 getStatement :: Statement -> Map.Map [Char] [Char] -> [Char]
@@ -99,8 +100,9 @@ getStatement statement mapping = statementStrs
 
 
 getParams :: Foldable t => t FormalParameterDecl -> Map.Map [Char] [Char] -> ([Char], Map.Map [Char] [Char])
-getParams params mapping = (intercalate ", " [newParam | newParam <- newParamList], new_mapping)
-    where (newParamList, new_mapping) = foldl storeParams ([], mapping) params
+getParams params mapping = (intercalate ", " [newParam | newParam <- reversedList], new_mapping)
+    where   (newParamList, new_mapping) = foldl storeParams ([], mapping) params
+            reversedList = reverse newParamList -- IIWIW:)
 
 
 storeParams :: ([[Char]], Map.Map [Char] [Char]) -> FormalParameterDecl -> ([[Char]], Map.Map [Char] [Char])

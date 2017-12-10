@@ -1,12 +1,12 @@
 package com.gobletsky.test;
 import java.lang.System.*;
 public class Math{
-public int add(int jumbdajhpf, int xexyhnljxg){
-int iyfsxkoaya=xexyhnljxg+jumbdajhpf;
-return giweddbcfe;
+public int add(int cbhscngniv, int qvsogahpqw, int kfaswnkgsq, int zzbfcqyiyu){
+int roaoxxfroz=cbhscngniv+qvsogahpqw+kfaswnkgsq+zzbfcqyiyu;
+return roaoxxfroz;
 }
-public int subtract(int oygyykjlvi, int aumooupklx){
-int kwzhytutmd=aumooupklx-oygyykjlvi;
-return bfqowsaxer;
+public int subtract(int sbrenhbqey, int cduixgrzfe, int uvvevwwdyh, int hipqdvxonv){
+int iheclpppnv=sbrenhbqey-cduixgrzfe-uvvevwwdyh-hipqdvxonv;
+return iheclpppnv;
 }
 }
