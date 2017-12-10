@@ -92,6 +92,12 @@ getAltStatement statement mapping = case statement of
 
     Assign (VarAcc name) exp -> (((getObfName name mapping) ++ "=" ++ (getExpr exp mapping) ++ ";"), mapping)
     Return exp -> ("return " ++ (getExpr exp mapping) ++ ";", mapping)
+    MethodCall name args -> ((getName name) ++ "(" ++ argsList ++ ");", mapping)
+                            where (argsList, _) = getMethodArgs args mapping
+
+
+
+getMethodArgs args mapping = (intercalate ", " [getObfName name mapping | (ArgumentDecl name) <- args], mapping)
 
 
 getStatement :: Statement -> Map.Map [Char] [Char] -> [Char]

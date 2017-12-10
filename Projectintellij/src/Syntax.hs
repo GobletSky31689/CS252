@@ -50,11 +50,17 @@ data FormalParameterDecl = FormalParameterDecl Bool Type Name
 data PackageDecl = PackageDecl Name
     deriving (Eq,Show,Read)
 
+
+data ArgumentDecl = ArgumentDecl Name
+    deriving (Eq,Show,Read)
+
+
 data Statement
     = Declare VarDecl (Maybe Exp)
     | Assign VarAcc Exp
     | Sequence Statement Statement
     | Return Exp
+    | MethodCall Name [ArgumentDecl]
     deriving (Eq,Show,Read)
 
 -- Only supporting few expressions for now.

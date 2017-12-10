@@ -13,6 +13,7 @@ singleString = do
     return x
 
 
+
 -- singleStringForType :: GenParser Char st String
 -- singleStringForType = do
 --     x <- many1 (oneOf "[]" <|> letter)
@@ -226,6 +227,15 @@ returnP = do
     return $ Return expr
 
 
+getMethodArgsP :: GenParser Char st [ArgumentDecl]
+getMethodArgsP = do
+    vars <- varP `sepBy` (char ',')
+    spaces
+    char ')'
+    spaces
+    return $ [ArgumentDecl (Name [Identifier x]) | x <- vars]
+
+
 varAssignDeclP :: GenParser Char st Statement
 varAssignDeclP = do
     var <- varP
@@ -233,19 +243,26 @@ varAssignDeclP = do
     isAssignStmt <- optionMaybe (char '=')
     spaces
     case isAssignStmt of
-        Just x -> do
+        Just _ -> do
             expr <- exprP
             return $ Assign (translVar var) expr
         Nothing -> do
-            var' <- varP
-            spaces
-            isAssignStmtAlso <- optionMaybe (char '=')
-            spaces
-            case isAssignStmtAlso of
-                Just y -> do
-                    expr <- optionMaybe exprP
-                    return $ Declare (VarDecl (transType var) (Name [Identifier var'])) expr
-                Nothing -> return $ Declare (VarDecl (transType var) (Name [Identifier var'])) Nothing
+            isMethodCall <- optionMaybe (char '(')
+            case isMethodCall of
+                Just _ -> do
+                    args <- getMethodArgsP
+                    spaces
+                    return $ MethodCall (Name [Identifier var]) args
+                Nothing -> do
+                    var' <- varP
+                    spaces
+                    isAssignStmtAlso <- optionMaybe (char '=')
+                    spaces
+                    case isAssignStmtAlso of
+                        Just y -> do
+                            expr <- optionMaybe exprP
+                            return $ Declare (VarDecl (transType var) (Name [Identifier var'])) expr
+                        Nothing -> return $ Declare (VarDecl (transType var) (Name [Identifier var'])) Nothing
 
 
 
