@@ -30,16 +30,38 @@ getMethod (MethodDecl modifiers ret_type name params statements) =
                                     ++ "{\n" ++ (getStatement statements) ++ "\n}"
 
 
+getLiteral literal = case literal of
+    Int i -> show i
+    Boolean bool -> show bool
+    Real double -> show double
+
+
+getBinOp x = case x of
+    Plus -> "+"
+    Minus -> "-"
+    Times -> "*"
+    Divide -> "/"
+    Gt -> ">"
+    Ge -> ">="
+    Lt -> "<"
+    Le -> "<="
+
+getExpr exp = case exp of
+    Lit literal -> getLiteral literal
+    Var (VarAcc name) -> getName name
+    Op binOp exp1 exp2 -> (getExpr exp1) ++ (getBinOp binOp) ++ (getExpr exp2)
+
+
+
 getStatement statement = case statement of
     Sequence st1 st2 -> (getStatement st1) ++ "\n" ++ (getStatement st2)
-    Declare (VarDecl _type name) exp -> case exp of
-                            Just exp' -> do
-                                        (getType _type)
-                                     ++ (getName name)
-                                     ++ "="
-                                     ++ ("Some__exp")
-                                     ++ ";"
-    Assign (VarAcc name) exp -> (getName name) ++ "=" ++ ("Some__exp") ++ ";"
+    Declare (VarDecl _type name) exp -> (getType _type)
+                               ++ (getName name)
+                               ++ (case exp of
+                                     Just exp' -> "=" ++ (getExpr exp')
+                                     Nothing -> "")
+                               ++ ";"
+    Assign (VarAcc name) exp -> (getName name) ++ "=" ++ (getExpr exp) ++ ";"
 
 
 
