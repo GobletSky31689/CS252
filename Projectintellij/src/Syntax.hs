@@ -86,6 +86,7 @@ data Name = Name [Identifier]
 data Type
     = PrimType Primitives
     | ClassRefType Identifier
+    | ArrayType Type
     deriving (Eq,Show,Read)
 
 
