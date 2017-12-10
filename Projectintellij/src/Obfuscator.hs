@@ -27,14 +27,18 @@ getClassDecl (ClassDecl modifiers name body) mapping = (getModifiers modifiers) 
                                                 ++ "{\n" ++ (getClassBody body mapping) ++ "\n}"
 
 
-getMethod :: MethodDecl -> Map.Map [Char] [Char] -> [Char]
+getMethod :: MethodDecl -> Map.Map [Char] [Char] -> ([Char],  Map.Map [Char] [Char])
 getMethod (MethodDecl modifiers ret_type name params statements) mapping =
-                                    (getModifiers modifiers)
+                                    ((getModifiers modifiers)
                                     ++ (getType ret_type)
-                                    ++ (getName name)
+                                    ++ (obf_name)
                                     ++ "(" ++ formal_params ++ ")"
-                                    ++ "{\n" ++ (getStatement statements mapping') ++ "\n}"
-                                    where (formal_params, mapping') = (getParams params mapping)
+                                    ++ "{\n" ++ obf_statements ++ "\n}", mapping''')
+                                    where (obf_name, mapping') = getObfName name mapping
+                                          (formal_params, mapping'') = (getParams params mapping')
+                                          (obf_statements, mapping''') = getAltStatement statements mapping''
+
+
 
 
 getLiteral :: Literal -> String
@@ -56,10 +60,12 @@ getBinOp x = case x of
     Le     -> "<="
 
 
-getObfName :: Name -> Map.Map [Char] [Char] -> [Char]
+getObfName :: Name -> Map.Map [Char] [Char] -> ([Char], Map.Map [Char] [Char])
 getObfName name mapping = case (Map.lookup orig_name mapping) of
-                                 Just s' -> s'
-                                 Nothing -> orig_name
+                                 Just s' -> (s', mapping)
+                                 Nothing -> (s, mapping')
+                                    where mapping' = storeObfName name mapping
+                                          (s, _) = getObfName name mapping'
                           where orig_name = getName name
 
 
@@ -72,7 +78,8 @@ storeObfName name mapping = Map.insert orig_name obf_name mapping
 getExpr :: Exp -> Map.Map [Char] [Char] -> [Char]
 getExpr exp mapping = case exp of
     Lit literal -> getLiteral literal
-    Var (VarAcc name) -> getObfName name mapping
+    Var (VarAcc name) -> obf_name
+        where (obf_name, _) = getObfName name mapping
     Op binOp exp1 exp2 -> (getExpr exp1 mapping) ++ (getBinOp binOp) ++ (getExpr exp2 mapping)
 
 
@@ -83,30 +90,29 @@ getAltStatement statement mapping = case statement of
                           (secondStatement, mapping'') = (getAltStatement st2 mapping')
 
     Declare (VarDecl _type name) exp -> (((getType _type)
-                                   ++ (getObfName name mapping')
+                                   ++ (obf_name)
                                    ++ (case exp of
                                          Just exp' -> "=" ++ (getExpr exp' mapping')
                                          Nothing -> "")
                                    ++ ";"), mapping')
-                                   where mapping' = storeObfName name mapping
+                                   where (obf_name, mapping') = getObfName name mapping
 
-    Assign (VarAcc name) exp -> (((getObfName name mapping) ++ "=" ++ (getExpr exp mapping) ++ ";"), mapping)
+    Assign (VarAcc name) exp -> ((obf_name ++ "=" ++ (getExpr exp mapping) ++ ";"), mapping)
+                        where (obf_name, _) = getObfName name mapping
     Return exp -> ("return " ++ (getExpr exp mapping) ++ ";", mapping)
-    MethodCall name args -> ((getName name) ++ "(" ++ argsList ++ ");", mapping)
-                            where (argsList, _) = getMethodArgs args mapping
+    MethodCall name args -> (obf_name ++ "(" ++ argsList ++ ");", mapping'')
+                            where (obf_name, mapping') = getObfName name mapping
+                                  (argsList, mapping'') = getMethodArgs args mapping'
 
 
 
-getMethodArgs args mapping = (intercalate ", " [getObfName name mapping | (ArgumentDecl name) <- args], mapping)
-
-
-getStatement :: Statement -> Map.Map [Char] [Char] -> [Char]
-getStatement statement mapping = statementStrs
-    where (statementStrs, mapping') = getAltStatement statement mapping
+getMethodArgs :: [ArgumentDecl] -> Map.Map [Char] [Char] -> ([Char], Map.Map [Char] [Char])
+getMethodArgs args mapping = (intercalate ", " [item | (item, _) <- new_list], mapping)
+                    where new_list = [getObfName name mapping | (ArgumentDecl name) <- args]
 
 
 getParams :: Foldable t => t FormalParameterDecl -> Map.Map [Char] [Char] -> ([Char], Map.Map [Char] [Char])
-getParams params mapping = (intercalate ", " [newParam | newParam <- reversedList], new_mapping)
+getParams params mapping = (intercalate ", " reversedList, new_mapping)
     where   (newParamList, new_mapping) = foldl storeParams ([], mapping) params
             reversedList = reverse newParamList -- IIWIW:)
 
@@ -119,8 +125,8 @@ storeParams (acc_args, acc_mapping) param = ((param' : acc_args), new_acc_mappin
 getParam :: FormalParameterDecl -> Map.Map [Char] [Char] -> ([Char], Map.Map [Char] [Char])
 getParam (FormalParameterDecl isFinal _type name) mapping = ((if isFinal then "final " else "")
                                     ++ (getType _type)
-                                    ++ (getObfName name mapping'), mapping')
-                                    where mapping' = storeObfName name mapping
+                                    ++ obf_name, mapping')
+                                    where (obf_name, mapping') = getObfName name mapping
 
 
 getType :: Type -> [Char]
@@ -138,7 +144,12 @@ getType _type = case _type of
 
 
 getClassBody :: ClassBody -> Map.Map [Char] [Char] -> [Char]
-getClassBody (ClassBody methods) mapping = intercalate "\n" [getMethod method mapping| method <- methods]
+getClassBody (ClassBody methods) mapping = intercalate "\n" reversedList
+    where  (newMethodList, new_mapping) = foldl storeMethods ([], mapping) methods
+           reversedList = reverse newMethodList -- IIWIW:)
+
+storeMethods (acc_methods, acc_mapping) method = ((method' : acc_methods), new_acc_mapping)
+    where (method', new_acc_mapping) = getMethod method acc_mapping
 
 
 getModifiers :: Show a => [a] -> [Char]
@@ -174,6 +185,6 @@ main = do
         Left parseErr -> print parseErr
         Right ast     -> do
             writeFile ((head args) ++ "_obf.ast") (show ast)
-            writeToFile ((head args) ++ "_obf.java") ast
+            writeToFile ("obf_" ++ (head args)) ast
 
 

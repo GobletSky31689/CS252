@@ -1,17 +1,18 @@
 package com.gobletsky.test;
 import java.lang.System.*;
 
-public class Math{
+public class test {
 
-public int add(int x, int y, int z, int a) {
-    int c = x + y + z + a;
-    subtract(x, c);
+public int add(int x, int y) {
+    int c = x + y;
+    subtract(x, y);
     return c;
 }
 
 
-public int subtract(int x, int y, int a, int v) {
-        int c = x - y - a - v;
+public int subtract(int x, int y) {
+        int c = x - y;
+        add(x, c);
         return c;
 }
 

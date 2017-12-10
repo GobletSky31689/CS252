@@ -1,13 +1,14 @@
 package com.gobletsky.test;
 import java.lang.System.*;
-public class Math{
-public int add(int hbixldnlch, int wmtupqpnvi, int gfbxfdsewc, int epsalgffcg){
-int mfcugnnesk=hbixldnlch+wmtupqpnvi+gfbxfdsewc+epsalgffcg;
-subtract(hbixldnlch, mfcugnnesk);
-return mfcugnnesk;
+public class test.java_obf{
+public int khhoksmqic(int ybslovxtqd, int slzfesqkrx){
+int qfarkvolhb=ybslovxtqd+slzfesqkrx;
+zuklpcvknv(ybslovxtqd, slzfesqkrx);
+return qfarkvolhb;
 }
-public int subtract(int ybijgxtnyz, int idvdgmywkp, int zmmkemebcs, int miqvmlpmrg){
-int ohwhufwnrh=ybijgxtnyz-idvdgmywkp-zmmkemebcs-miqvmlpmrg;
-return ohwhufwnrh;
+public int ahrbfnrteu(int ybslovxtqd, int slzfesqkrx){
+int ujeufchcpa=ybslovxtqd-slzfesqkrx;
+khhoksmqic(ybslovxtqd, ujeufchcpa);
+return ujeufchcpa;
 }
 }
