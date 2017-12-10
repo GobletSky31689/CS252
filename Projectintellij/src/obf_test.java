@@ -1,14 +1,14 @@
 package com.gobletsky.test;
 import java.lang.System.*;
 public class obf_test{
-public int rebcfoyqdo(int gymjjraclf, int qrtdzodtnj){
-int ocupfrqutd=gymjjraclf+qrtdzodtnj;
-wrejazytjh(gymjjraclf, qrtdzodtnj);
-return ocupfrqutd;
+public int vzglprrtzr(int ktbhtetvht, int umylzbvmjn){
+int sxzyfutopr=ktbhtetvht+umylzbvmjn;
+amjhkbrxfv(ktbhtetvht, umylzbvmjn);
+return sxzyfutopr;
 }
-public int wrejazytjh(int gymjjraclf, int qrtdzodtnj){
-int ocupfrqutd=gymjjraclf-qrtdzodtnj;
-rebcfoyqdo(gymjjraclf, ocupfrqutd);
-return ocupfrqutd;
+public int amjhkbrxfv(int ktbhtetvht, int umylzbvmjn){
+int sxzyfutopr=ktbhtetvht-umylzbvmjn;
+vzglprrtzr(ktbhtetvht, sxzyfutopr);
+return sxzyfutopr;
 }
 }

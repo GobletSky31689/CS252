@@ -23,7 +23,7 @@ toLowerStr str = [toLower singleChar | singleChar <- str]
 
 
 getClassDecl :: ClassDecl -> Map.Map [Char] [Char] -> [Char]
-getClassDecl (ClassDecl modifiers name body) mapping = (getModifiers modifiers) ++ "class " ++ (getName name)
+getClassDecl (ClassDecl modifiers name body) mapping = (getModifiers modifiers) ++ "class obf_" ++ (getName name)
                                                 ++ "{\n" ++ (getClassBody body mapping) ++ "\n}"
 
 
