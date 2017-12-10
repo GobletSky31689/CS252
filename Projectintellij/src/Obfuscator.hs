@@ -46,9 +46,13 @@ getBinOp x = case x of
     Lt -> "<"
     Le -> "<="
 
+
+getObfName name = (getName name) ++ "_1"
+
+
 getExpr exp = case exp of
     Lit literal -> getLiteral literal
-    Var (VarAcc name) -> getName name
+    Var (VarAcc name) -> getObfName name
     Op binOp exp1 exp2 -> (getExpr exp1) ++ (getBinOp binOp) ++ (getExpr exp2)
 
 
@@ -56,12 +60,12 @@ getExpr exp = case exp of
 getStatement statement = case statement of
     Sequence st1 st2 -> (getStatement st1) ++ "\n" ++ (getStatement st2)
     Declare (VarDecl _type name) exp -> (getType _type)
-                               ++ (getName name)
+                               ++ (getObfName name)
                                ++ (case exp of
                                      Just exp' -> "=" ++ (getExpr exp')
                                      Nothing -> "")
                                ++ ";"
-    Assign (VarAcc name) exp -> (getName name) ++ "=" ++ (getExpr exp) ++ ";"
+    Assign (VarAcc name) exp -> (getObfName name) ++ "=" ++ (getExpr exp) ++ ";"
 
 
 
