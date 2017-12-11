@@ -75,12 +75,17 @@ storeObfName name mapping = Map.insert orig_name obf_name mapping
                                 obf_name = take 10 $ randomRs ('a','z') $ unsafePerformIO newStdGen
 
 
-getExpr :: Exp -> Map.Map [Char] [Char] -> [Char]
+getExpr :: Exp -> Map.Map [Char] [Char] -> ([Char], Map.Map [Char] [Char])
 getExpr exp mapping = case exp of
-    Lit literal -> getLiteral literal
-    Var (VarAcc name) -> obf_name
+    Lit literal -> (getLiteral literal, mapping)
+    Var (VarAcc name) -> (obf_name, mapping)
         where (obf_name, _) = getObfName name mapping
-    Op binOp exp1 exp2 -> (getExpr exp1 mapping) ++ (getBinOp binOp) ++ (getExpr exp2 mapping)
+    Op binOp exp1 exp2 -> (obf_expr1 ++ (getBinOp binOp) ++ obf_expr2, mapping'')
+                where (obf_expr1, mapping') = (getExpr exp1 mapping)
+                      (obf_expr2, mapping'') = (getExpr exp2 mapping')
+    (MethodExp name args) -> (obf_name ++ "(" ++ argsList ++ ");", mapping'')
+                            where (obf_name, mapping') = getObfName name mapping
+                                  (argsList, mapping'') = getMethodArgs args mapping'
 
 
 getAltStatement :: Statement -> Map.Map [Char] [Char] -> ([Char], Map.Map [Char] [Char])
@@ -89,18 +94,22 @@ getAltStatement statement mapping = case statement of
                     where (firstStatement, mapping') = (getAltStatement st1 mapping)
                           (secondStatement, mapping'') = (getAltStatement st2 mapping')
 
-    Declare (VarDecl _type name) exp -> (((getType _type)
-                                   ++ (obf_name)
-                                   ++ (case exp of
-                                         Just exp' -> "=" ++ (getExpr exp' mapping')
-                                         Nothing -> "")
-                                   ++ ";"), mapping')
+    Declare (VarDecl _type name) exp -> (case exp of
+                                Just exp' -> ((getType _type)
+                                             ++ (obf_name)
+                                             ++ "=" ++ obf_expr ++ ";", mapping'')
+                                             where (obf_expr, mapping'') = getExpr exp' mapping'
+                                Nothing   -> ((getType _type)
+                                             ++ (obf_name) ++ ";", mapping'))
                                    where (obf_name, mapping') = getObfName name mapping
 
-    Assign (VarAcc name) exp -> ((obf_name ++ "=" ++ (getExpr exp mapping) ++ ";"), mapping)
-                        where (obf_name, _) = getObfName name mapping
-    Return exp -> ("return " ++ (getExpr exp mapping) ++ ";", mapping)
-    MethodCall name args -> (obf_name ++ "(" ++ argsList ++ ");", mapping'')
+
+    Assign (VarAcc name) exp -> ((obf_name ++ "=" ++ obf_exp ++ ";"), mapping')
+                            where (obf_name, _) = getObfName name mapping
+                                  (obf_exp, mapping') = getExpr exp mapping
+    Return exp -> ("return " ++ obf_exp ++ ";", mapping')
+                            where (obf_exp, mapping') = getExpr exp mapping
+    MethodCall (MethodExp name args) -> (obf_name ++ "(" ++ argsList ++ ");", mapping'')
                             where (obf_name, mapping') = getObfName name mapping
                                   (argsList, mapping'') = getMethodArgs args mapping'
 

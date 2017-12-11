@@ -252,7 +252,7 @@ varAssignDeclP = do
                 Just _ -> do
                     args <- getMethodArgsP
                     spaces
-                    return $ MethodCall (getNameFromArr var) args
+                    return $ MethodCall $ MethodExp (getNameFromArr var) args
                 Nothing -> do
                     var' <- varP `sepBy` (char '.')
                     spaces
@@ -268,15 +268,24 @@ varAssignDeclP = do
 getNameFromArr x = (Name [Identifier x1 | x1 <- x])
 
 
+getNameFromVar (Var (VarAcc x)) = x
+
 exprP :: GenParser Char st Exp
 exprP = do
     spaces
     lExpr <- (transrVar varP) <|> valP
     spaces
     rest <- optionMaybe restP
-    return (case rest of
-        Nothing   -> lExpr
-        Just (op, rExpr) -> Op (transOp op) lExpr rExpr)
+    case rest of
+        Nothing   -> do
+            isMethodCall <- optionMaybe (char '(')
+            case isMethodCall of
+                Just _ -> do
+                    args <- getMethodArgsP
+                    spaces
+                    return $ MethodExp (getNameFromVar lExpr) args
+                Nothing -> return lExpr
+        Just (op, rExpr) -> return $ Op (transOp op) lExpr rExpr
 
 
 restP = do

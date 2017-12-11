@@ -60,7 +60,7 @@ data Statement
     | Assign VarAcc Exp
     | Sequence Statement Statement
     | Return Exp
-    | MethodCall Name [ArgumentDecl]
+    | MethodCall Exp
     deriving (Eq,Show,Read)
 
 -- Only supporting few expressions for now.
@@ -68,6 +68,7 @@ data Exp
     = Lit Literal
     | Var VarAcc
     | Op BinOp Exp Exp
+    | MethodExp Name [ArgumentDecl]
     deriving (Eq,Show,Read)
 
 -- An variable declaration
