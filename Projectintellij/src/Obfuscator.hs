@@ -63,7 +63,7 @@ getBinOp x = case x of
 getObfName :: Name -> Map.Map [Char] [Char] -> ([Char], Map.Map [Char] [Char])
 getObfName name mapping = case (Map.lookup orig_name mapping) of
                                  Just s' -> (s', mapping)
-                                 Nothing -> (s, mapping')
+                                 Nothing -> if ('.' `elem` orig_name) then (orig_name, mapping) else (s, mapping')
                                     where mapping' = storeObfName name mapping
                                           (s, _) = getObfName name mapping'
                           where orig_name = getName name
