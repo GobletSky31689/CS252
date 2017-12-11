@@ -60,10 +60,13 @@ getBinOp x = case x of
     Le     -> "<="
 
 
+
+shouldObfuscate token = (not ('.' `elem` token) && (token /= "main") )
+
 getObfName :: Name -> Map.Map [Char] [Char] -> ([Char], Map.Map [Char] [Char])
 getObfName name mapping = case (Map.lookup orig_name mapping) of
                                  Just s' -> (s', mapping)
-                                 Nothing -> if ('.' `elem` orig_name) then (orig_name, mapping) else (s, mapping')
+                                 Nothing -> if (shouldObfuscate orig_name) then (s, mapping') else (orig_name, mapping)
                                     where mapping' = storeObfName name mapping
                                           (s, _) = getObfName name mapping'
                           where orig_name = getName name
@@ -180,6 +183,7 @@ getImport (ImportDecl isStatic name isWildCard) = "import " ++ (if isStatic then
 getPackage :: Maybe PackageDecl -> [Char]
 getPackage packageName = case packageName of
         Just (PackageDecl name) -> "package " ++ (getName name) ++ ";\n"
+        Nothing -> ""
 
 
 getName :: Name -> [Char]

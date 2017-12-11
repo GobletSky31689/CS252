@@ -1,18 +1,19 @@
-package com.gobletsky.test;
 import java.lang.System.*;
 public class obf_test{
-public static void umxsglzzhu(String[] igipkybbpl){
-int tpqsqvdsrp=3;
-int rkhfwordxj=1;
-int zzqpbvzdnn=kmxerpfmdm(tpqsqvdsrp, rkhfwordxj);;
-System.out.println(zzqpbvzdnn);
+public static void main(String[] ngjocjahsh){
+int baulqwcjai=3;
+int vkbowjfabc=1;
+int uecbcmsbrh=ctmlhtaaxl(baulqwcjai, vkbowjfabc);;
+System.out.println(uecbcmsbrh);
+int dgtaxdgjok=niguxslszq(baulqwcjai, vkbowjfabc);;
+System.out.println(dgtaxdgjok);
 }
-public int kmxerpfmdm(int vykyreklet, int mgbfzdqpxw){
-int ztfqhcbamu=vykyreklet+mgbfzdqpxw;
-return ztfqhcbamu;
+public static int ctmlhtaaxl(int fawbvsrxrt, int snamdrcigh){
+int tmgylljjgh=fawbvsrxrt+snamdrcigh;
+return tmgylljjgh;
 }
-public int asucpmibmk(int vykyreklet, int mgbfzdqpxw){
-int ztfqhcbamu=vykyreklet-mgbfzdqpxw;
-return ztfqhcbamu;
+public static int niguxslszq(int fawbvsrxrt, int snamdrcigh){
+int tmgylljjgh=fawbvsrxrt-snamdrcigh;
+return tmgylljjgh;
 }
 }
