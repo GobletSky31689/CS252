@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{collberg}
+Christian~S. Collberg, Clark~D. Thomborson, and Douglas Low.
+\newblock A taxonomy of obfuscating transformations.
+\newblock 1997.
+
+\bibitem{java_specs}
+James Gosling, Bill Joy, Guy~L. Steele, Jr., Gilad Bracha, and Alex Buckley.
+\newblock {\em The Java Language Specification, Java SE 7 Edition}.
+\newblock Addison-Wesley Professional, 1st edition, 2013.
+
+\end{thebibliography}

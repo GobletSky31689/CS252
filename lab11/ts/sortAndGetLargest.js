@@ -17,4 +17,4 @@ function sortAndGetLargest(arr) {
     return tmp;
 }
 var largest = sortAndGetLargest([99, 2, 43, 8, 0, 21, 12]);
-console.log(largest); // should be 99, but prints 0
+console.log(largest);

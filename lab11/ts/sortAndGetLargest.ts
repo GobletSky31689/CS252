@@ -1,10 +1,10 @@
-function swap(arr,i,j) {
-  var tmp = arr[i]; 
+function swap(arr: number[],i: number,j: number) : void {
+  var tmp : number = arr[i]; 
   arr[i] = arr[j]; 
   arr[j] = tmp;
 }
-function sortAndGetLargest (arr) {
-  var tmp = arr[0]; // largest elem
+function sortAndGetLargest (arr: number[]) : number {
+  var tmp : number = arr[0]; // largest elem
   for (var i=0; i<arr.length; i++) {
     if (arr[i] > tmp){
     	tmp = arr[i];
@@ -16,6 +16,6 @@ function sortAndGetLargest (arr) {
   }
   return tmp;
 }
-var largest = sortAndGetLargest([99,2,43,8,0,21,12]);
+var largest :number = sortAndGetLargest([99,2,43,8,0,21,12]);
 console.log(largest);
 

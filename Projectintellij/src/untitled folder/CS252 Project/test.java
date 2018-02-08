@@ -3,7 +3,7 @@ import java.lang.System.*;
 public class test {
 
     public static void main(String[] args){
-          float a = 3.01;
+          float a = 3.0;
           int b = 1;
           int sum = add(a, b);
           System.out.println(sum);

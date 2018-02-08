@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+
+\bibitem{nisan2007algorithmic}
+Noam Nisan, Tim Roughgarden, Eva Tardos, and Vijay~V Vazirani.
+\newblock {\em Algorithmic game theory}, volume~1.
+\newblock Cambridge University Press Cambridge, 2007.
+
+\bibitem{simpkins2008towards}
+Christopher Simpkins, Sooraj Bhat, Charles Isbell~Jr, and Michael Mateas.
+\newblock Towards adaptive programming.
+\newblock 2008.
+
+\end{thebibliography}

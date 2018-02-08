@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99d (TeX Live 2017)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: Report.aux
+The style file: plainurl.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: cs252project.bib
+Warning--empty booktitle in collberg
+You've used 2 entries,
+            2849 wiz_defined-function locations,
+            625 strings with 5319 characters,
+and the built_in function-call counts, 877 in all, are:
+= -- 74
+> -- 48
+< -- 0
++ -- 20
+- -- 16
+* -- 46
+:= -- 158
+add.period$ -- 6
+call.type$ -- 2
+change.case$ -- 14
+chr.to.int$ -- 0
+cite$ -- 3
+duplicate$ -- 25
+empty$ -- 75
+format.name$ -- 16
+if$ -- 208
+int.to.chr$ -- 0
+int.to.str$ -- 2
+missing$ -- 3
+newline$ -- 13
+num.names$ -- 4
+pop$ -- 30
+preamble$ -- 1
+purify$ -- 12
+quote$ -- 0
+skip$ -- 51
+stack$ -- 0
+substring$ -- 12
+swap$ -- 2
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 6
+warning$ -- 1
+while$ -- 4
+width$ -- 3
+write$ -- 22
+(There was 1 warning)
